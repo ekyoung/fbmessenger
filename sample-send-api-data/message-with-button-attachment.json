@@ -1,0 +1,26 @@
+{
+  "recipient": {
+    "id": "USER_ID"
+  },
+  "message": {
+    "attachment": {
+      "type": "template",
+      "payload": {
+        "template_type": "button",
+        "text": "What do you want to do next?",
+        "buttons": [
+          {
+            "type": "web_url",
+            "title": "Show Website",
+            "url": "https://petersapparel.parseapp.com"
+          },
+          {
+            "type": "postback",
+            "title": "Start Chatting",
+            "payload": "USER_DEFINED_PAYLOAD"
+          }
+        ]
+      }
+    }
+  }
+}
