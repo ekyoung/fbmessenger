@@ -1,0 +1,3 @@
+test:
+  post:
+   - mv ./test-reports/* $CIRCLE_TEST_REPORTS
