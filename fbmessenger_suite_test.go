@@ -16,5 +16,5 @@ func TestWebhooks(t *testing.T) {
 	testReportsPath, _ := filepath.Abs("./test-reports")
 	os.MkdirAll(testReportsPath, 0777)
 	junitReporter := reporters.NewJUnitReporter(filepath.Join(testReportsPath, "fbmessenger-junit.xml"))
-	RunSpecsWithDefaultAndCustomReporters(t, "Webhooks Suite", []Reporter{junitReporter})
+	RunSpecsWithDefaultAndCustomReporters(t, "FBMessenger Suite", []Reporter{junitReporter})
 }
