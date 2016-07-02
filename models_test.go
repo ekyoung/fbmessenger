@@ -59,57 +59,34 @@ var _ = Describe("Callback Models", func() {
 
 var _ = Describe("Send API Models", func() {
 	It("should marshal a send request with a text message", func() {
-		sendRequest := &SendRequest{
-			Recipient: Principal{Id: "USER_ID"},
-			Message: Message{
-				Text: "Hello, world!",
-			},
-		}
+		sendRequest := NewSendRequest("USER_ID").
+			WithTextMessage("Hello, world!")
 
 		expectCorrectSendRequestMarshaling(sendRequest, "text-message.json")
 	})
 
 	It("should marshal a send request with an image attachment", func() {
-		sendRequest := &SendRequest{
-			Recipient: Principal{Id: "USER_ID"},
-			Message: Message{
-				Attachment: &Attachment{
-					Type: "image",
-					Payload: ImagePayload{
-						Url: "IMAGE_URL",
-					},
-				},
-			},
-		}
+		sendRequest := NewSendRequest("USER_ID").
+			WithImageUrl("IMAGE_URL")
 
 		expectCorrectSendRequestMarshaling(sendRequest, "message-with-image-attachment.json")
 	})
 
 	It("should marshal a send request with a button attachment", func() {
-		sendRequest := &SendRequest{
-			Recipient: Principal{Id: "USER_ID"},
-			Message: Message{
-				Attachment: &Attachment{
-					Type: "template",
-					Payload: ButtonPayload{
-						TemplateType: "button",
-						Text:         "What do you want to do next?",
-						Buttons: []*Button{
-							&Button{
-								Type:  "web_url",
-								Url:   "https://petersapparel.parseapp.com",
-								Title: "Show Website",
-							},
-							&Button{
-								Type:    "postback",
-								Title:   "Start Chatting",
-								Payload: "USER_DEFINED_PAYLOAD",
-							},
-						},
-					},
-				},
-			},
+		showWebsite := &Button{
+			Type:  "web_url",
+			Url:   "https://petersapparel.parseapp.com",
+			Title: "Show Website",
 		}
+
+		startChatting := &Button{
+			Type:    "postback",
+			Title:   "Start Chatting",
+			Payload: "USER_DEFINED_PAYLOAD",
+		}
+
+		sendRequest := NewSendRequest("USER_ID").
+			WithButtonTemplate("What do you want to do next?", showWebsite, startChatting)
 
 		expectCorrectSendRequestMarshaling(sendRequest, "message-with-button-attachment.json")
 	})

@@ -127,6 +127,48 @@ type SendError struct {
 	FBTraceId string `json:"fbtrace_id" binding:"required"`
 }
 
+func NewSendRequest(userId string) *SendRequest {
+	return &SendRequest{
+		Recipient: Principal{Id: "USER_ID"},
+	}
+}
+
+func (sr *SendRequest) WithTextMessage(text string) *SendRequest {
+	sr.Message = Message{
+		Text: text,
+	}
+
+	return sr
+}
+
+func (sr *SendRequest) WithImageUrl(url string) *SendRequest {
+	sr.Message = Message{
+		Attachment: &Attachment{
+			Type: "image",
+			Payload: ImagePayload{
+				Url: url,
+			},
+		},
+	}
+
+	return sr
+}
+
+func (sr *SendRequest) WithButtonTemplate(text string, buttons ...*Button) *SendRequest {
+	sr.Message = Message{
+		Attachment: &Attachment{
+			Type: "template",
+			Payload: ButtonPayload{
+				TemplateType: "button",
+				Text:         text,
+				Buttons:      buttons,
+			},
+		},
+	}
+
+	return sr
+}
+
 /*
 User Profile API
 
