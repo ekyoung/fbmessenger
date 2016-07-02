@@ -61,7 +61,7 @@ var _ = Describe("Send API Models", func() {
 	It("should marshal a send request with a text message", func() {
 		sendRequest := &SendRequest{
 			Recipient: Principal{Id: "USER_ID"},
-			Message: SendMessage{
+			Message: Message{
 				Text: "Hello, world!",
 			},
 		}
@@ -72,8 +72,8 @@ var _ = Describe("Send API Models", func() {
 	It("should marshal a send request with an image attachment", func() {
 		sendRequest := &SendRequest{
 			Recipient: Principal{Id: "USER_ID"},
-			Message: SendMessage{
-				Attachment: &SendAttachment{
+			Message: Message{
+				Attachment: &Attachment{
 					Type: "image",
 					Payload: ImagePayload{
 						Url: "IMAGE_URL",
@@ -88,8 +88,8 @@ var _ = Describe("Send API Models", func() {
 	It("should marshal a send request with a button attachment", func() {
 		sendRequest := &SendRequest{
 			Recipient: Principal{Id: "USER_ID"},
-			Message: SendMessage{
-				Attachment: &SendAttachment{
+			Message: Message{
+				Attachment: &Attachment{
 					Type: "template",
 					Payload: ButtonPayload{
 						TemplateType: "button",

@@ -105,7 +105,7 @@ func createMessageCallback() *Callback {
 			Sender:    Principal{Id: "456"},
 			Recipient: Principal{Id: "765"},
 			Timestamp: 876,
-			Message: &Message{
+			Message: &CallbackMessage{
 				MessageId: "mid.3345",
 				Sequence:  89,
 				Text:      "Some text.",

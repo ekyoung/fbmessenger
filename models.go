@@ -19,13 +19,13 @@ type Entry struct {
 }
 
 type MessagingEntry struct {
-	Sender    Principal `json:"sender" binding:"required"`
-	Recipient Principal `json:"recipient" binding:"required"`
-	Timestamp int       `json:"timestamp"`
-	Message   *Message  `json:"message"`
-	Delivery  *Delivery `json:"delivery"`
-	Postback  *Postback `json:"postback"`
-	OptIn     *OptIn    `json:"optin"`
+	Sender    Principal        `json:"sender" binding:"required"`
+	Recipient Principal        `json:"recipient" binding:"required"`
+	Timestamp int              `json:"timestamp"`
+	Message   *CallbackMessage `json:"message"`
+	Delivery  *Delivery        `json:"delivery"`
+	Postback  *Postback        `json:"postback"`
+	OptIn     *OptIn           `json:"optin"`
 }
 
 type Principal struct {
@@ -37,14 +37,14 @@ Message Received
 
 Messages can have either "text" or "attachments".
 */
-type Message struct {
-	MessageId   string        `json:"mid" binding:"required"`
-	Sequence    int           `json:"seq" binding:"required"`
-	Text        string        `json:"text"`
-	Attachments []*Attachment `json:"attachments"`
+type CallbackMessage struct {
+	MessageId   string                `json:"mid" binding:"required"`
+	Sequence    int                   `json:"seq" binding:"required"`
+	Text        string                `json:"text"`
+	Attachments []*CallbackAttachment `json:"attachments"`
 }
 
-type Attachment struct {
+type CallbackAttachment struct {
 	Type    string  `json:"type" binding:"required"`
 	Payload Payload `json:"payload" binding:"required"`
 }
@@ -82,16 +82,16 @@ Send API
 For sending messages.
 */
 type SendRequest struct {
-	Recipient Principal   `json:"recipient" binding:"required"`
-	Message   SendMessage `json:"message" binding:"required"`
+	Recipient Principal `json:"recipient" binding:"required"`
+	Message   Message   `json:"message" binding:"required"`
 }
 
-type SendMessage struct {
-	Text       string          `json:"text,omitempty"`
-	Attachment *SendAttachment `json:"attachment,omitempty"`
+type Message struct {
+	Text       string      `json:"text,omitempty"`
+	Attachment *Attachment `json:"attachment,omitempty"`
 }
 
-type SendAttachment struct {
+type Attachment struct {
 	Type    string      `json:"type" binding:"required"`
 	Payload interface{} `json:"payload" binding:"required"`
 }
