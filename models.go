@@ -129,7 +129,7 @@ type SendError struct {
 
 func NewSendRequest(userId string) *SendRequest {
 	return &SendRequest{
-		Recipient: Principal{Id: "USER_ID"},
+		Recipient: Principal{Id: userId},
 	}
 }
 
