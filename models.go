@@ -127,44 +127,44 @@ type SendError struct {
 	FBTraceId string `json:"fbtrace_id" binding:"required"`
 }
 
-func NewSendRequest(userId string) *SendRequest {
+func TextMessage(text string) *SendRequest {
 	return &SendRequest{
-		Recipient: Principal{Id: userId},
+		Message: Message{
+			Text: text,
+		},
 	}
 }
 
-func (sr *SendRequest) WithTextMessage(text string) *SendRequest {
-	sr.Message = Message{
-		Text: text,
-	}
-
-	return sr
-}
-
-func (sr *SendRequest) WithImageUrl(url string) *SendRequest {
-	sr.Message = Message{
-		Attachment: &Attachment{
-			Type: "image",
-			Payload: ImagePayload{
-				Url: url,
+func ImageMessage(url string) *SendRequest {
+	return &SendRequest{
+		Message: Message{
+			Attachment: &Attachment{
+				Type: "image",
+				Payload: ImagePayload{
+					Url: url,
+				},
 			},
 		},
 	}
-
-	return sr
 }
 
-func (sr *SendRequest) WithButtonTemplate(text string, buttons ...*Button) *SendRequest {
-	sr.Message = Message{
-		Attachment: &Attachment{
-			Type: "template",
-			Payload: ButtonPayload{
-				TemplateType: "button",
-				Text:         text,
-				Buttons:      buttons,
+func ButtonTemplateMessage(text string, buttons ...*Button) *SendRequest {
+	return &SendRequest{
+		Message: Message{
+			Attachment: &Attachment{
+				Type: "template",
+				Payload: ButtonPayload{
+					TemplateType: "button",
+					Text:         text,
+					Buttons:      buttons,
+				},
 			},
 		},
 	}
+}
+
+func (sr *SendRequest) To(userId string) *SendRequest {
+	sr.Recipient = Principal{Id: userId}
 
 	return sr
 }

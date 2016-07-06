@@ -59,15 +59,13 @@ var _ = Describe("Callback Models", func() {
 
 var _ = Describe("Send API Models", func() {
 	It("should marshal a send request with a text message", func() {
-		sendRequest := NewSendRequest("USER_ID").
-			WithTextMessage("Hello, world!")
+		sendRequest := TextMessage("Hello, world!").To("USER_ID")
 
 		expectCorrectSendRequestMarshaling(sendRequest, "text-message.json")
 	})
 
 	It("should marshal a send request with an image attachment", func() {
-		sendRequest := NewSendRequest("USER_ID").
-			WithImageUrl("IMAGE_URL")
+		sendRequest := ImageMessage("IMAGE_URL").To("USER_ID")
 
 		expectCorrectSendRequestMarshaling(sendRequest, "message-with-image-attachment.json")
 	})
@@ -85,8 +83,7 @@ var _ = Describe("Send API Models", func() {
 			Payload: "USER_DEFINED_PAYLOAD",
 		}
 
-		sendRequest := NewSendRequest("USER_ID").
-			WithButtonTemplate("What do you want to do next?", showWebsite, startChatting)
+		sendRequest := ButtonTemplateMessage("What do you want to do next?", showWebsite, startChatting).To("USER_ID")
 
 		expectCorrectSendRequestMarshaling(sendRequest, "message-with-button-attachment.json")
 	})
