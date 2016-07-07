@@ -18,20 +18,21 @@ Stable installation via [gopkg.in](http://labix.org/gopkg.in) coming soon.
 
 ### Webhook Reference
 
-The struct type `Callback` can be created by unmarshaling the json received at your webhook endpoint.
+Unmarshal the json received at your webhook endpoint into an instance of type `Callback`.
 
 ```go
 cb := &fbmessenger.Callback{}
 err = json.Unmarshal(requestBytes, cb)
 ```
 
-The interface type `CallbackDispatcher` examines callbacks and routes each `MessageEntry` to handlers you
-register for each type of message. Pass your unmarshalled callback struct to `Dispatch` to feed it
-to your handlers. Note that due to webhook batching, a handler may be called more than once per callback.
+Use type `CallbackDispatcher` to route each `MessageEntry` included in the callback to an appropriate
+handler for the type of entry. Note that due to webhook batching, a handler may be called more than
+once per callback.
 
 ```go
-dispatcher := fbmessenger.NewCallbackDispatcher()
-dispatcher.OnMessageReceived(MessageReceived)
+dispatcher := &fbmessenger.CallbackDispatcher{
+	MessageHandler: MessageReceived
+}
 
 err := dispatcher.Dispatch(cb)
 if err != nil {
