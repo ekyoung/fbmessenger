@@ -22,7 +22,7 @@ Unmarshal the json received at your webhook endpoint into an instance of type `C
 
 ```go
 cb := &fbmessenger.Callback{}
-err = json.Unmarshal(requestBytes, cb)
+err := json.Unmarshal(requestBytes, cb)
 ```
 
 Use type `CallbackDispatcher` to route each `MessageEntry` included in the callback to an appropriate
@@ -35,9 +35,6 @@ dispatcher := &fbmessenger.CallbackDispatcher{
 }
 
 err := dispatcher.Dispatch(cb)
-if err != nil {
-	//Error handling
-}
 ```
 
 Callback handlers should have a signature mathing the `MessageEntryHandler` type.
