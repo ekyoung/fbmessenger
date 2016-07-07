@@ -7,24 +7,26 @@ import (
 	"net/http"
 )
 
-type SendApi struct {
-	PageAccessToken string
+type Sender interface {
+	Send(sendRequest *SendRequest) (*SendResponse, error)
 }
 
-func NewSendApi(pageAccessToken string) *SendApi {
-	return &SendApi{
-		PageAccessToken: pageAccessToken,
+type sender struct {
+	url string
+}
+
+func NewSender(pageAccessToken string) Sender {
+	return &sender{
+		url: "https://graph.facebook.com/v2.6/me/messages?access_token=" + pageAccessToken,
 	}
 }
 
-func (api *SendApi) Send(sendRequest *SendRequest) (*SendResponse, error) {
-	url := "https://graph.facebook.com/v2.6/me/messages?access_token=" + api.PageAccessToken
-
+func (s *sender) Send(sendRequest *SendRequest) (*SendResponse, error) {
 	requestBytes, err := json.Marshal(sendRequest)
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBytes))
+	req, err := http.NewRequest("POST", s.url, bytes.NewBuffer(requestBytes))
 	if err != nil {
 		return nil, err
 	}
