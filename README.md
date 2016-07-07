@@ -50,11 +50,11 @@ func MessageReceived(cb *fbmessenger.MessagingEntry) error {
 
 ### Send API Reference
 
-The interface type `Sender` handles sending to the messenger API. Create one using the page access
+Type `Sender` handles sending to the messenger API. Create one using the page access
 token for the page you want to send as.
 
 ```go
-sendApi := fbmessenger.NewSendApi("YOUR_PAGE_ACCESS_TOKEN")
+sender := fbmessenger.NewSender("YOUR_PAGE_ACCESS_TOKEN")
 ```
 
 There are structs for the different types of messages you can send. The easiest way to create them
@@ -67,12 +67,27 @@ request := fbmessenger.TextMessage("Hello, world!").To("USER_ID")
 Then send your request and handle errors in sending, and errors returned from Facebook.
 
 ```go
-response, err := sendApi.Send(request)
+response, err := sender.Send(request)
 if err != nil {
 	//Got an error. Request never got to Facebook.
-} else if sendResponse.Error != nil {
+} else if response.Error != nil {
 	//Request got to Facebook. Facebook returned an error.
 } else {
 	//Hooray!
 }
+```
+
+### User Profile Reference
+
+Use type `UserProfileGetter` to get a user's profile. Create one using the page
+access token for the page the user is conversing with.
+
+```go
+userProfileGetter := fbmessenger.NewUserProfileGetter("YOUR_PAGE_ACCESS_TOKEN")
+```
+
+Then request a user's profile using their userId.
+
+```go
+userProfile, err := userProfileGetter.Get(userId)
 ```
