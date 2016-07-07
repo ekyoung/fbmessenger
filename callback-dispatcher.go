@@ -2,14 +2,14 @@ package fbmessenger
 
 type MessageEntryHandler func(cb *MessagingEntry) error
 
-type MessageEntryHandlerDispatcher struct {
+type CallbackDispatcher struct {
 	MessageHandler        MessageEntryHandler
 	DeliveryHandler       MessageEntryHandler
 	PostbackHandler       MessageEntryHandler
 	AuthenticationHandler MessageEntryHandler
 }
 
-func (dispatcher *MessageEntryHandlerDispatcher) Dispatch(cb *Callback) error {
+func (dispatcher *CallbackDispatcher) Dispatch(cb *Callback) error {
 	for _, entry := range cb.Entries {
 		for _, messagingEntry := range entry.Messaging {
 			if messagingEntry.Message != nil {

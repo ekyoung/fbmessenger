@@ -43,7 +43,7 @@ var _ = Describe("MessageEntryHandlerDispatcher", func() {
 	})
 
 	It("should dispatch message callbacks to the message handler", func() {
-		dispatcher := &MessageEntryHandlerDispatcher{
+		dispatcher := &CallbackDispatcher{
 			MessageHandler: messageHandler,
 		}
 
@@ -53,7 +53,7 @@ var _ = Describe("MessageEntryHandlerDispatcher", func() {
 	})
 
 	It("should dispatch delivery callbacks to the delivery handler", func() {
-		dispatcher := &MessageEntryHandlerDispatcher{
+		dispatcher := &CallbackDispatcher{
 			DeliveryHandler: deliveryHandler,
 		}
 
@@ -63,7 +63,7 @@ var _ = Describe("MessageEntryHandlerDispatcher", func() {
 	})
 
 	It("should dispatch postback callbacks to the postback handler", func() {
-		dispatcher := &MessageEntryHandlerDispatcher{
+		dispatcher := &CallbackDispatcher{
 			PostbackHandler: postbackHandler,
 		}
 
@@ -73,7 +73,7 @@ var _ = Describe("MessageEntryHandlerDispatcher", func() {
 	})
 
 	It("should dispatch authentication callbacks to the authentication handler", func() {
-		dispatcher := &MessageEntryHandlerDispatcher{
+		dispatcher := &CallbackDispatcher{
 			AuthenticationHandler: authenticationHandler,
 		}
 
@@ -83,7 +83,7 @@ var _ = Describe("MessageEntryHandlerDispatcher", func() {
 	})
 
 	It("should not dispatch callbacks when there is no registered handler", func() {
-		dispatcher := &MessageEntryHandlerDispatcher{}
+		dispatcher := &CallbackDispatcher{}
 
 		dispatcher.Dispatch(createMessageCallback())
 		dispatcher.Dispatch(createDeliveryCallback())
