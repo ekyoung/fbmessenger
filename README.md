@@ -88,3 +88,11 @@ Then request a user's profile using their userId.
 ```go
 userProfile, err := userProfileGetter.Get(userId)
 ```
+
+For more control when getting a user's profile (timeouts, etc.) use the
+`GetWithContext` method.
+
+```go
+ctx, _ := context.WithTimeout(context.Background(), 100*time.Millisecond)
+userProfile, err := userProfileGetter.GetWithContext(ctx, userId)
+```
