@@ -4,6 +4,12 @@
 
 Go (golang) package for writing bots on the [Facebook Messenger Platform](https://developers.facebook.com/docs/messenger-platform).
 
+## Key Features
+
+* Fluent API makes building messages to send easy.
+* Timeoutable, cancellable requests using `context.Context`.
+* Designed for use with one or many subscribed pages.
+
 ## Installation
 
 Expect breaking changes:
@@ -16,7 +22,11 @@ Stable installation via [gopkg.in](http://labix.org/gopkg.in) coming soon.
 
 ## Quick Start
 
-### Webhook Reference
+The primary types in the package are `CallbackDispatcher` and `Client`. `CallbackDispatcher`
+is used to handle the callbacks Facebook sends to your webhook endpoint. `Client` is used to send
+messages and to get user profiles.
+
+### CallbackDispatcher
 
 Unmarshal the json received at your webhook endpoint into an instance of type `Callback`.
 
@@ -45,13 +55,12 @@ func MessageReceived(cb *fbmessenger.MessagingEntry) error {
 }
 ```
 
-### Send API Reference
+### Client
 
-Type `Sender` handles sending to the messenger API. Create one using the page access
-token for the page you want to send as.
+Create a `Client` to make requests to the messenger API.
 
 ```go
-sender := fbmessenger.NewSender("YOUR_PAGE_ACCESS_TOKEN")
+client := fbmessenger.Client{}
 ```
 
 There are structs for the different types of messages you can send. The easiest way to create them
@@ -64,7 +73,7 @@ request := fbmessenger.TextMessage("Hello, world!").To("USER_ID")
 Then send your request and handle errors in sending, and errors returned from Facebook.
 
 ```go
-response, err := sender.Send(request)
+response, err := client.Send(request, "YOUR_PAGE_ACCESS_TOKEN")
 if err != nil {
 	//Got an error. Request never got to Facebook.
 } else if response.Error != nil {
@@ -74,25 +83,17 @@ if err != nil {
 }
 ```
 
-### User Profile Reference
-
-Use type `UserProfileGetter` to get a user's profile. Create one using the page
-access token for the page the user is conversing with.
+Get a user's profile using their userId.
 
 ```go
-userProfileGetter := fbmessenger.NewUserProfileGetter("YOUR_PAGE_ACCESS_TOKEN")
+userProfile, err := client.GetUserProfile("USER_ID", "YOUR_PAGE_ACCESS_TOKEN")
 ```
 
-Then request a user's profile using their userId.
+For more control over requests (timeouts, etc.) use the `*WithContext` version of the
+above methods.
 
 ```go
-userProfile, err := userProfileGetter.Get(userId)
-```
-
-For more control when getting a user's profile (timeouts, etc.) use the
-`GetWithContext` method.
-
-```go
-ctx, _ := context.WithTimeout(context.Background(), 100*time.Millisecond)
-userProfile, err := userProfileGetter.GetWithContext(ctx, userId)
+ctx, _ := context.WithTimeout(context.Background(), 500*time.Millisecond)
+response, err := client.SendWithContext(ctx, request, "YOUR_PAGE_ACCESS_TOKEN")
+userProfile, err := userProfileGetter.GetUserProfileWithContext(ctx, "USER_ID", "YOUR_PAGE_ACCESS_TOKEN")
 ```
