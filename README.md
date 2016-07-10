@@ -97,3 +97,7 @@ ctx, _ := context.WithTimeout(context.Background(), 500*time.Millisecond)
 response, err := client.SendWithContext(ctx, request, "YOUR_PAGE_ACCESS_TOKEN")
 userProfile, err := userProfileGetter.GetUserProfileWithContext(ctx, "USER_ID", "YOUR_PAGE_ACCESS_TOKEN")
 ```
+
+## Inspiration
+
+Some ideas where pulled from [Go Client Library Best Practices](https://medium.com/@cep21/go-client-library-best-practices-83d877d604ca) by Jack Lindamood.
