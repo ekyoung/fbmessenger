@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"golang.org/x/net/context"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
