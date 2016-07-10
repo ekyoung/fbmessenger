@@ -21,9 +21,9 @@ CallbackDispatcher Usage
 	cb := &fbmessenger.Callback{}
 	err := json.Unmarshal(requestBytes, cb)
 
-	// Use type CallbackDispatcher to route each MessageEntry included in the callback to an appropriate
-	// handler for the type of entry. Note that due to webhook batching, a handler may be called more than
-	// once per callback.
+	// Use type CallbackDispatcher to route each MessageEntry included in the callback to an
+	// appropriate handler for the type of entry. Note that due to webhook batching, a
+	// handler may be called more than once per callback.
 
 	dispatcher := &fbmessenger.CallbackDispatcher{
 		MessageHandler: MessageReceived
@@ -43,8 +43,8 @@ Client Usage
 
 	client := fbmessenger.Client{}
 
-	// There are structs for the different types of messages you can send. The easiest way to create them
-	// is with the fluent API.
+	// There are structs for the different types of messages you can send. The easiest way to
+	// create them is with the fluent API.
 
 	request := fbmessenger.TextMessage("Hello, world!").To("USER_ID")
 
