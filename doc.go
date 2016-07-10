@@ -4,9 +4,9 @@ the Facebook Messenger Platform API.
 
 Key Features
 
-* Fluent API makes building messages to send easy.
-* Timeoutable, cancellable requests using `context.Context`.
-* Designed for use with one or many subscribed pages.
+	* Fluent API makes building messages to send easy.
+	* Timeoutable, cancellable requests using `context.Context`.
+	* Designed for use with one or many subscribed pages.
 
 Quick Start
 
