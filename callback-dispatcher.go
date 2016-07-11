@@ -1,7 +1,13 @@
 package fbmessenger
 
+// MessageEntryHandler functions are for handling individual interactions with a user.
 type MessageEntryHandler func(cb *MessagingEntry) error
 
+/*
+CallbackDispatcher routes each MessagingEntry included in a callback to an appropriate
+handler for the type of entry. Note that due to webhook batching, a handler may be called
+more than once per callback.
+*/
 type CallbackDispatcher struct {
 	MessageHandler        MessageEntryHandler
 	DeliveryHandler       MessageEntryHandler
@@ -9,6 +15,10 @@ type CallbackDispatcher struct {
 	AuthenticationHandler MessageEntryHandler
 }
 
+/*
+Dispatch routes each MessagingEntry included in the callback to an appropriate
+handler for the type of entry.
+*/
 func (dispatcher *CallbackDispatcher) Dispatch(cb *Callback) error {
 	for _, entry := range cb.Entries {
 		for _, messagingEntry := range entry.Messaging {

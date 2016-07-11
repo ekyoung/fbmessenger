@@ -21,7 +21,7 @@ CallbackDispatcher Usage
 	cb := &fbmessenger.Callback{}
 	err := json.Unmarshal(requestBytes, cb)
 
-	// Use type CallbackDispatcher to route each MessageEntry included in the callback to an
+	// Use type CallbackDispatcher to route each MessagingEntry included in the callback to an
 	// appropriate handler for the type of entry. Note that due to webhook batching, a
 	// handler may be called more than once per callback.
 

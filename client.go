@@ -15,15 +15,36 @@ type httpDoer interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
+/*
+Client is used to send messages and get user profiles. Use the empty value in most cases.
+The URL field can be overridden to allow for writing integration tests that use a different
+endpoint (not Facebook).
+*/
 type Client struct {
 	URL      string
 	httpDoer httpDoer
 }
 
+/*
+Send POSTs a request to and returns a response from the Send API. A response from
+Facebook indicating an error does not return an error. Be sure to check for errors
+in sending, and errors in the response from Facebook.
+
+	response, err := client.Send(request, "YOUR_PAGE_ACCESS_TOKEN")
+	if err != nil {
+		//Got an error. Request never got to Facebook.
+	} else if response.Error != nil {
+		//Request got to Facebook. Facebook returned an error.
+	} else {
+		//Hooray!
+	}
+
+*/
 func (c *Client) Send(sendRequest *SendRequest, pageAccessToken string) (*SendResponse, error) {
 	return c.SendWithContext(context.Background(), sendRequest, pageAccessToken)
 }
 
+// SendWithContext is like Send but allows you to timeout or cancel the request using context.Context.
 func (c *Client) SendWithContext(ctx context.Context, sendRequest *SendRequest, pageAccessToken string) (*SendResponse, error) {
 	requestBytes, err := json.Marshal(sendRequest)
 	if err != nil {
@@ -46,10 +67,12 @@ func (c *Client) SendWithContext(ctx context.Context, sendRequest *SendRequest, 
 	return response, nil
 }
 
+// GetUserProfile GETs a profile with more information about the user.
 func (c *Client) GetUserProfile(userId, pageAccessToken string) (*UserProfile, error) {
 	return c.GetUserProfileWithContext(context.Background(), userId, pageAccessToken)
 }
 
+// GetUserProfileWithContext is like GetUserProfile but allows you to timeout or cancel the request using context.Context.
 func (c *Client) GetUserProfileWithContext(ctx context.Context, userId, pageAccessToken string) (*UserProfile, error) {
 	url := c.buildURL(fmt.Sprintf("%v?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token=%v", userId, pageAccessToken))
 
