@@ -14,7 +14,7 @@ func TextMessage(text string) *SendRequest {
 }
 
 // ImageMessage is a fluent helper method for creating a SendRequest containing a message with
-// an image attachment that has a URL payload.
+// an image attachment that has a MediaPayload.
 func ImageMessage(url string) *SendRequest {
 	return &SendRequest{
 		Message: Message{
@@ -132,17 +132,29 @@ type SendError struct {
 Webhook
 ------------------------------------------------------*/
 
+/*
+Callback is the top level structure that represents a callback received by your
+webhook endpoint.
+
+See https://developers.facebook.com/docs/messenger-platform/webhook-reference#format
+*/
 type Callback struct {
 	Object  string   `json:"object" binding:"required"`
 	Entries []*Entry `json:"entry" binding:"required"`
 }
 
+// Entry is part of the common format of callbacks.
 type Entry struct {
 	PageId    string            `json:"id" binding:"required"`
 	Time      int               `json:"time" binding:"required"`
 	Messaging []*MessagingEntry `json:"messaging"`
 }
 
+/*
+MessagingEntry is an individual interaction a user has with a page.
+The Sender and Recipient fields are common to all types of callbacks and the
+other fields only apply to specific types of callbacks.
+*/
 type MessagingEntry struct {
 	Sender    Principal        `json:"sender" binding:"required"`
 	Recipient Principal        `json:"recipient" binding:"required"`
@@ -154,11 +166,11 @@ type MessagingEntry struct {
 }
 
 /*
-Message Received
+CallbackMessage represents a message a user has sent to your page.
+Either the Text or Attachments field will be set, but not both.
 
-Messages can have either "text" or "attachments".
+See https://developers.facebook.com/docs/messenger-platform/webhook-reference/message-received
 */
-
 type CallbackMessage struct {
 	MessageId   string                `json:"mid" binding:"required"`
 	Sequence    int                   `json:"seq" binding:"required"`
@@ -166,19 +178,22 @@ type CallbackMessage struct {
 	Attachments []*CallbackAttachment `json:"attachments"`
 }
 
+// CallbackAttachment holds the type and payload of an attachment sent by a user.
 type CallbackAttachment struct {
-	Type    string  `json:"type" binding:"required"`
-	Payload Payload `json:"payload" binding:"required"`
+	Type    string                    `json:"type" binding:"required"`
+	Payload CallbackAttachmentPayload `json:"payload" binding:"required"`
 }
 
-type Payload struct {
+// CallbackAttachmentPayload holds the URL of an attachment sent by the user.
+type CallbackAttachmentPayload struct {
 	Url string `json:"url" binding:"required"`
 }
 
 /*
-Message Delivered
-*/
+Delivery holds information about which of the messages that you've sent have been delivered.
 
+See https://developers.facebook.com/docs/messenger-platform/webhook-reference/message-delivered
+*/
 type Delivery struct {
 	MessageIds []string `json:"mids"`
 	Watermark  int      `json:"watermark" binding:"required"`
@@ -186,17 +201,19 @@ type Delivery struct {
 }
 
 /*
-Postback
-*/
+Postback holds the data defined for buttons the user taps.
 
+See https://developers.facebook.com/docs/messenger-platform/webhook-reference/postback-received
+*/
 type Postback struct {
 	Payload string `json:"payload" binding:"required"`
 }
 
 /*
-Authentication
-*/
+OptIn holds the data defined for the Send-to-Messenger plugin.
 
+See https://developers.facebook.com/docs/messenger-platform/webhook-reference/authentication
+*/
 type OptIn struct {
 	Ref string `json:"ref" binding:"required"`
 }
@@ -205,6 +222,7 @@ type OptIn struct {
 Common
 ------------------------------------------------------*/
 
+// Principal holds the Id of a sender or recipient.
 type Principal struct {
 	Id string `json:"id" binding:"required"`
 }
