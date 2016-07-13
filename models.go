@@ -45,7 +45,7 @@ func ButtonTemplateMessage(text string, buttons ...*Button) *SendRequest {
 	}
 }
 
-// To is a fluent helper method for setting the Recipient of a SendRequest. It is a mutator
+// To is a fluent helper method for setting Recipient. It is a mutator
 // and returns the same SendRequest on which it is called to support method chaining.
 func (sr *SendRequest) To(userId string) *SendRequest {
 	sr.Recipient = Recipient{Id: userId}
@@ -53,10 +53,34 @@ func (sr *SendRequest) To(userId string) *SendRequest {
 	return sr
 }
 
-// ToPhoneNumber is a fluent helper method for setting the Recipient of a SendRequest. It
+// ToPhoneNumber is a fluent helper method for setting Recipient. It
 // is a mutator and returns the same SendRequest on which it is called to support method chaining.
 func (sr *SendRequest) ToPhoneNumber(phoneNumber string) *SendRequest {
 	sr.Recipient = Recipient{PhoneNumber: phoneNumber}
+	return sr
+}
+
+// Regular is a fluent helper method for setting NotificationType. It is a mutator and
+// returns the same SendRequest on which it is called to support method chaining.
+func (sr *SendRequest) Regular() *SendRequest {
+	sr.NotificationType = "REGULAR"
+
+	return sr
+}
+
+// SilentPush is a fluent helper method for setting NotificationType. It is a mutator and
+// returns the same SendRequest on which it is called to support method chaining.
+func (sr *SendRequest) SilentPush() *SendRequest {
+	sr.NotificationType = "SILENT_PUSH"
+
+	return sr
+}
+
+// NoPush is a fluent helper method for setting NotificationType. It is a mutator and
+// returns the same SendRequest on which it is called to support method chaining.
+func (sr *SendRequest) NoPush() *SendRequest {
+	sr.NotificationType = "NO_PUSH"
+
 	return sr
 }
 
@@ -66,8 +90,9 @@ SendRequest is the top level structure for representing any type of message to s
 See https://developers.facebook.com/docs/messenger-platform/send-api-reference#request
 */
 type SendRequest struct {
-	Recipient Recipient `json:"recipient" binding:"required"`
-	Message   Message   `json:"message" binding:"required"`
+	Recipient        Recipient `json:"recipient" binding:"required"`
+	Message          Message   `json:"message" binding:"required"`
+	NotificationType string    `json:"notification_type,omitempty"`
 }
 
 // Recipient identifies the user to send to. Either Id or PhoneNumber must be set, but not both.

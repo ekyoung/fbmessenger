@@ -64,12 +64,6 @@ var _ = Describe("Send API Models", func() {
 		expectCorrectSendRequestMarshaling(sendRequest, "text-message.json")
 	})
 
-	It("should marshal a send request to a phone number", func() {
-		sendRequest := TextMessage("Hello, world!").ToPhoneNumber("+1(212)555-2368")
-
-		expectCorrectSendRequestMarshaling(sendRequest, "text-message-to-phone-number.json")
-	})
-
 	It("should marshal a send request with an image attachment", func() {
 		sendRequest := ImageMessage("IMAGE_URL").To("USER_ID")
 
@@ -92,6 +86,30 @@ var _ = Describe("Send API Models", func() {
 		sendRequest := ButtonTemplateMessage("What do you want to do next?", showWebsite, startChatting).To("USER_ID")
 
 		expectCorrectSendRequestMarshaling(sendRequest, "message-with-button-attachment.json")
+	})
+
+	It("should marshal a send request to a phone number", func() {
+		sendRequest := TextMessage("Hello, world!").ToPhoneNumber("+1(212)555-2368")
+
+		expectCorrectSendRequestMarshaling(sendRequest, "text-message-to-phone-number.json")
+	})
+
+	It("should marshal a send request with a REGULAR notification type", func() {
+		sendRequest := TextMessage("Hello, world!").To("USER_ID").Regular()
+
+		expectCorrectSendRequestMarshaling(sendRequest, "text-message-regular.json")
+	})
+
+	It("should marshal a send request with a SILENT_PUSH notification type", func() {
+		sendRequest := TextMessage("Hello, world!").To("USER_ID").SilentPush()
+
+		expectCorrectSendRequestMarshaling(sendRequest, "text-message-silent-push.json")
+	})
+
+	It("should marshal a send request with a NO_PUSH notification type", func() {
+		sendRequest := TextMessage("Hello, world!").To("USER_ID").NoPush()
+
+		expectCorrectSendRequestMarshaling(sendRequest, "text-message-no-push.json")
 	})
 
 	It("should unmarshal a successful response", func() {

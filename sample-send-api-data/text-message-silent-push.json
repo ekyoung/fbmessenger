@@ -1,0 +1,9 @@
+{
+  "recipient": {
+    "id": "USER_ID"
+  },
+  "message": {
+    "text": "Hello, world!"
+  },
+  "notification_type": "SILENT_PUSH"
+}
