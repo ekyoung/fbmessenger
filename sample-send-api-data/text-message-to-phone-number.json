@@ -1,0 +1,8 @@
+{
+  "recipient": {
+    "phone_number": "+1(212)555-2368"
+  },
+  "message": {
+    "text": "Hello, world!"
+  }
+}

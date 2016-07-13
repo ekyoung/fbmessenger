@@ -48,8 +48,15 @@ func ButtonTemplateMessage(text string, buttons ...*Button) *SendRequest {
 // To is a fluent helper method for setting the Recipient of a SendRequest. It is a mutator
 // and returns the same SendRequest on which it is called to support method chaining.
 func (sr *SendRequest) To(userId string) *SendRequest {
-	sr.Recipient = Principal{Id: userId}
+	sr.Recipient = Recipient{Id: userId}
 
+	return sr
+}
+
+// ToPhoneNumber is a fluent helper method for setting the Recipient of a SendRequest. It
+// is a mutator and returns the same SendRequest on which it is called to support method chaining.
+func (sr *SendRequest) ToPhoneNumber(phoneNumber string) *SendRequest {
+	sr.Recipient = Recipient{PhoneNumber: phoneNumber}
 	return sr
 }
 
@@ -59,12 +66,18 @@ SendRequest is the top level structure for representing any type of message to s
 See https://developers.facebook.com/docs/messenger-platform/send-api-reference#request
 */
 type SendRequest struct {
-	Recipient Principal `json:"recipient" binding:"required"`
+	Recipient Recipient `json:"recipient" binding:"required"`
 	Message   Message   `json:"message" binding:"required"`
 }
 
+// Recipient identifies the user to send to. Either Id or PhoneNumber must be set, but not both.
+type Recipient struct {
+	Id          string `json:"id,omitempty"`
+	PhoneNumber string `json:"phone_number,omitempty"`
+}
+
 // Message can represent either a text message, or a message with an attachment. Either
-// Text or Attachment mut be set, but not both.
+// Text or Attachment must be set, but not both.
 type Message struct {
 	Text       string      `json:"text,omitempty"`
 	Attachment *Attachment `json:"attachment,omitempty"`
@@ -165,6 +178,11 @@ type MessagingEntry struct {
 	OptIn     *OptIn           `json:"optin"`
 }
 
+// Principal holds the Id of a sender or recipient.
+type Principal struct {
+	Id string `json:"id" binding:"required"`
+}
+
 /*
 CallbackMessage represents a message a user has sent to your page.
 Either the Text or Attachments field will be set, but not both.
@@ -216,15 +234,6 @@ See https://developers.facebook.com/docs/messenger-platform/webhook-reference/au
 */
 type OptIn struct {
 	Ref string `json:"ref" binding:"required"`
-}
-
-/*------------------------------------------------------
-Common
-------------------------------------------------------*/
-
-// Principal holds the Id of a sender or recipient.
-type Principal struct {
-	Id string `json:"id" binding:"required"`
 }
 
 /*------------------------------------------------------

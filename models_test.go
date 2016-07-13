@@ -64,6 +64,12 @@ var _ = Describe("Send API Models", func() {
 		expectCorrectSendRequestMarshaling(sendRequest, "text-message.json")
 	})
 
+	It("should marshal a send request to a phone number", func() {
+		sendRequest := TextMessage("Hello, world!").ToPhoneNumber("+1(212)555-2368")
+
+		expectCorrectSendRequestMarshaling(sendRequest, "text-message-to-phone-number.json")
+	})
+
 	It("should marshal a send request with an image attachment", func() {
 		sendRequest := ImageMessage("IMAGE_URL").To("USER_ID")
 
