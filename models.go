@@ -14,7 +14,7 @@ func TextMessage(text string) *SendRequest {
 }
 
 // ImageMessage is a fluent helper method for creating a SendRequest containing a message with
-// an image attachment that has a MediaPayload.
+// an image attachment using the URL of the image.
 func ImageMessage(url string) *SendRequest {
 	return &SendRequest{
 		Message: Message{
@@ -22,6 +22,21 @@ func ImageMessage(url string) *SendRequest {
 				Type: "image",
 				Payload: MediaPayload{
 					Url: url,
+				},
+			},
+		},
+	}
+}
+
+// ImageUploadMessage is a fluent helper method for creating a SendRequest containing a message
+// with an image attachment using the bytes of the image.
+func ImageUploadMessage(data []byte) *SendRequest {
+	return &SendRequest{
+		Message: Message{
+			Attachment: &Attachment{
+				Type: "image",
+				Payload: MediaPayload{
+					Data: data,
 				},
 			},
 		},
@@ -115,12 +130,14 @@ type Attachment struct {
 }
 
 /*
-MediaPayload is used to hold the URL of media attached to a message.
+MediaPayload is used to hold the URL or bytes of media attached to a message. Either URL
+or Data must be set, but not both.
 
 See https://developers.facebook.com/docs/messenger-platform/send-api-reference/image-attachment
 */
 type MediaPayload struct {
-	Url string `json:"url" binding:"required"`
+	Url  string `json:"url,omitempty"`
+	Data []byte `json:"-"`
 }
 
 /*

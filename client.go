@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-const apiURL = "https://graph.facebook.com/v2.6/"
+const apiURL = "https://graph.facebook.com/v2.6"
 
 type httpDoer interface {
 	Do(req *http.Request) (*http.Response, error)
@@ -51,7 +51,7 @@ func (c *Client) SendWithContext(ctx context.Context, sendRequest *SendRequest, 
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", c.buildURL("me/messages?access_token="+pageAccessToken), bytes.NewBuffer(requestBytes))
+	req, err := http.NewRequest("POST", c.buildURL("/me/messages?access_token="+pageAccessToken), bytes.NewBuffer(requestBytes))
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (c *Client) GetUserProfile(userId, pageAccessToken string) (*UserProfile, e
 
 // GetUserProfileWithContext is like GetUserProfile but allows you to timeout or cancel the request using context.Context.
 func (c *Client) GetUserProfileWithContext(ctx context.Context, userId, pageAccessToken string) (*UserProfile, error) {
-	url := c.buildURL(fmt.Sprintf("%v?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token=%v", userId, pageAccessToken))
+	url := c.buildURL(fmt.Sprintf("/%v?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token=%v", userId, pageAccessToken))
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

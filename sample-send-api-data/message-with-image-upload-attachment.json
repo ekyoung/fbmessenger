@@ -1,0 +1,11 @@
+{
+  "recipient": {
+    "id": "USER_ID"
+  },
+  "message": {
+    "attachment": {
+      "type": "image",
+      "payload": {}
+    }
+  }
+}

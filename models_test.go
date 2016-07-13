@@ -70,6 +70,17 @@ var _ = Describe("Send API Models", func() {
 		expectCorrectSendRequestMarshaling(sendRequest, "message-with-image-attachment.json")
 	})
 
+	It("should marshal a send request with an image upload attachment", func() {
+		imageBytes, err := ioutil.ReadFile("./sample-send-api-data/fb-logo.png")
+		if err != nil {
+			Fail(fmt.Sprintf("Error reading image file: %v", err))
+		}
+
+		sendRequest := ImageUploadMessage(imageBytes).To("USER_ID")
+
+		expectCorrectSendRequestMarshaling(sendRequest, "message-with-image-upload-attachment.json")
+	})
+
 	It("should marshal a send request with a button attachment", func() {
 		showWebsite := &Button{
 			Type:  "web_url",
