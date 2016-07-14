@@ -5,8 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"golang.org/x/net/context"
+	"image"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
+
+	_ "image/gif"
+	_ "image/jpeg"
+	"image/png"
 )
 
 const apiURL = "https://graph.facebook.com/v2.6"
@@ -46,6 +53,43 @@ func (c *Client) Send(sendRequest *SendRequest, pageAccessToken string) (*SendRe
 
 // SendWithContext is like Send but allows you to timeout or cancel the request using context.Context.
 func (c *Client) SendWithContext(ctx context.Context, sendRequest *SendRequest, pageAccessToken string) (*SendResponse, error) {
+	var req *http.Request
+	var err error
+
+	if isUploadMessage(sendRequest) {
+		req, err = c.newFormDataRequest(sendRequest, pageAccessToken)
+	} else {
+		req, err = c.newJSONRequest(sendRequest, pageAccessToken)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	response := &SendResponse{}
+	err = c.doRequest(ctx, req, response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func isUploadMessage(sendRequest *SendRequest) bool {
+	if sendRequest.Message.Attachment == nil {
+		return false
+	}
+
+	payload, ok := sendRequest.Message.Attachment.Payload.(MediaPayload)
+
+	if !ok {
+		return false
+	}
+
+	return payload.Data != nil
+}
+
+func (c *Client) newJSONRequest(sendRequest *SendRequest, pageAccessToken string) (*http.Request, error) {
 	requestBytes, err := json.Marshal(sendRequest)
 	if err != nil {
 		return nil, err
@@ -58,13 +102,81 @@ func (c *Client) SendWithContext(ctx context.Context, sendRequest *SendRequest, 
 
 	req.Header.Set("Content-Type", "application/json")
 
-	response := &SendResponse{}
-	err = c.doRequest(ctx, req, response)
+	return req, nil
+}
+
+func (c *Client) newFormDataRequest(sendRequest *SendRequest, pageAccessToken string) (*http.Request, error) {
+	payload, ok := sendRequest.Message.Attachment.Payload.(MediaPayload)
+	if !ok {
+		return nil, fmt.Errorf("sendRequest must be for a message with an attachment that has a MediaPayload.")
+	}
+
+	if payload.Data == nil {
+		return nil, fmt.Errorf("sendRequest must be for a message with an attachment that has a MediaPayload with data to upload.")
+	}
+
+	var reqBuffer bytes.Buffer
+	w := multipart.NewWriter(&reqBuffer)
+
+	err := writeFormField(w, "recipient", sendRequest.Recipient)
 	if err != nil {
 		return nil, err
 	}
 
-	return response, nil
+	err = writeFormField(w, "message", sendRequest.Message)
+	if err != nil {
+		return nil, err
+	}
+
+	if sendRequest.NotificationType != "" {
+		writeFormField(w, "notification_type", sendRequest.NotificationType)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	header := make(textproto.MIMEHeader)
+	header.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, "filedata", "upload.png"))
+	header.Set("Content-Type", "image/png")
+
+	fileWriter, err := w.CreatePart(header)
+	if err != nil {
+		return nil, err
+	}
+
+	imgReader := bytes.NewReader(payload.Data)
+	img, _, err := image.Decode(imgReader)
+	if err != nil {
+		return nil, err
+	}
+
+	err = png.Encode(fileWriter, img)
+	if err != nil {
+		return nil, err
+	}
+
+	w.Close()
+
+	req, err := http.NewRequest("POST", c.buildURL("/me/messages?access_token="+pageAccessToken), &reqBuffer)
+	//req, err := http.NewRequest("POST", "http://httpbin.org/post", &reqBuffer)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", w.FormDataContentType())
+
+	return req, nil
+}
+
+func writeFormField(w *multipart.Writer, fieldName string, value interface{}) error {
+	valueBytes, err := json.Marshal(value)
+	if err != nil {
+		return fmt.Errorf("Error marshaling value for field %v: %v", fieldName, err)
+	}
+
+	w.WriteField(fieldName, string(valueBytes))
+
+	return nil
 }
 
 // GetUserProfile GETs a profile with more information about the user.
