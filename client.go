@@ -5,15 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"golang.org/x/net/context"
-	"image"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
-
-	_ "image/gif"
-	_ "image/jpeg"
-	"image/png"
 )
 
 const apiURL = "https://graph.facebook.com/v2.6"
@@ -56,7 +51,7 @@ func (c *Client) SendWithContext(ctx context.Context, sendRequest *SendRequest, 
 	var req *http.Request
 	var err error
 
-	if isUploadMessage(sendRequest) {
+	if isDataMessage(sendRequest) {
 		req, err = c.newFormDataRequest(sendRequest, pageAccessToken)
 	} else {
 		req, err = c.newJSONRequest(sendRequest, pageAccessToken)
@@ -75,18 +70,14 @@ func (c *Client) SendWithContext(ctx context.Context, sendRequest *SendRequest, 
 	return response, nil
 }
 
-func isUploadMessage(sendRequest *SendRequest) bool {
+func isDataMessage(sendRequest *SendRequest) bool {
 	if sendRequest.Message.Attachment == nil {
 		return false
 	}
 
-	payload, ok := sendRequest.Message.Attachment.Payload.(MediaPayload)
+	_, ok := sendRequest.Message.Attachment.Payload.(DataPayload)
 
-	if !ok {
-		return false
-	}
-
-	return payload.Data != nil
+	return ok
 }
 
 func (c *Client) newJSONRequest(sendRequest *SendRequest, pageAccessToken string) (*http.Request, error) {
@@ -106,14 +97,7 @@ func (c *Client) newJSONRequest(sendRequest *SendRequest, pageAccessToken string
 }
 
 func (c *Client) newFormDataRequest(sendRequest *SendRequest, pageAccessToken string) (*http.Request, error) {
-	payload, ok := sendRequest.Message.Attachment.Payload.(MediaPayload)
-	if !ok {
-		return nil, fmt.Errorf("sendRequest must be for a message with an attachment that has a MediaPayload.")
-	}
-
-	if payload.Data == nil {
-		return nil, fmt.Errorf("sendRequest must be for a message with an attachment that has a MediaPayload with data to upload.")
-	}
+	payload, _ := sendRequest.Message.Attachment.Payload.(DataPayload)
 
 	var reqBuffer bytes.Buffer
 	w := multipart.NewWriter(&reqBuffer)
@@ -136,21 +120,15 @@ func (c *Client) newFormDataRequest(sendRequest *SendRequest, pageAccessToken st
 	}
 
 	header := make(textproto.MIMEHeader)
-	header.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, "filedata", "upload.png"))
-	header.Set("Content-Type", "image/png")
+	header.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, "filedata", payload.FileName))
+	header.Set("Content-Type", payload.ContentType)
 
 	fileWriter, err := w.CreatePart(header)
 	if err != nil {
 		return nil, err
 	}
 
-	imgReader := bytes.NewReader(payload.Data)
-	img, _, err := image.Decode(imgReader)
-	if err != nil {
-		return nil, err
-	}
-
-	err = png.Encode(fileWriter, img)
+	_, err = fileWriter.Write(payload.Data)
 	if err != nil {
 		return nil, err
 	}

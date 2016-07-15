@@ -65,7 +65,7 @@ var _ = Describe("Client", func() {
 			Expect(server.ReceivedRequests()).To(HaveLen(1))
 		})
 
-		It("should POST json when sending an image message", func() {
+		It("should POST json when sending an image attached using the URL of the image", func() {
 			server.AppendHandlers(
 				ghttp.CombineHandlers(
 					ghttp.VerifyRequest("POST", "/me/messages"),
@@ -92,7 +92,7 @@ var _ = Describe("Client", func() {
 			Expect(server.ReceivedRequests()).To(HaveLen(1))
 		})
 
-		It("should POST form data when sending an image upload message", func() {
+		It("should POST form data when sending an image attached by uploading the image", func() {
 			server.AppendHandlers(
 				ghttp.CombineHandlers(
 					ghttp.VerifyRequest("POST", "/me/messages"),
@@ -109,7 +109,7 @@ var _ = Describe("Client", func() {
 				Fail(fmt.Sprintf("Error reading image file: %v", err))
 			}
 
-			request := ImageUploadMessage(imageBytes).To("USER_ID")
+			request := ImageDataMessage(imageBytes, "image/png").To("USER_ID")
 			response, err := client.Send(request, pageAccessToken)
 
 			if err != nil {

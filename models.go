@@ -1,5 +1,9 @@
 package fbmessenger
 
+import (
+	"strings"
+)
+
 /*------------------------------------------------------
 Send API
 ------------------------------------------------------*/
@@ -14,29 +18,39 @@ func TextMessage(text string) *SendRequest {
 }
 
 // ImageMessage is a fluent helper method for creating a SendRequest containing a message with
-// an image attachment using the URL of the image.
+// an image attached using the URL of the image.
 func ImageMessage(url string) *SendRequest {
 	return &SendRequest{
 		Message: Message{
 			Attachment: &Attachment{
 				Type: "image",
-				Payload: MediaPayload{
-					Url: url,
+				Payload: ResourcePayload{
+					URL: url,
 				},
 			},
 		},
 	}
 }
 
-// ImageUploadMessage is a fluent helper method for creating a SendRequest containing a message
-// with an image attachment using the bytes of the image.
-func ImageUploadMessage(data []byte) *SendRequest {
+/*
+ImageDataMessage is a fluent helper method for creating a SendRequest containing a message
+with an image attached by uploading the bytes of the image.
+
+	imageBytes, _ := ioutil.ReadFile("./cool-pic.png")
+	request := ImageDataMessage(imageBytes, "image/png").To("USER_ID")
+
+Detecting the content type of a file dynamically, or converting to one of the image formats
+supported by Facebook is the responsibility of the user.
+*/
+func ImageDataMessage(data []byte, contentType string) *SendRequest {
 	return &SendRequest{
 		Message: Message{
 			Attachment: &Attachment{
 				Type: "image",
-				Payload: MediaPayload{
-					Data: data,
+				Payload: DataPayload{
+					Data:        data,
+					ContentType: contentType,
+					FileName:    strings.Replace(contentType, "/", ".", -1), //Should yield file names like "image.png"
 				},
 			},
 		},
@@ -130,14 +144,25 @@ type Attachment struct {
 }
 
 /*
-MediaPayload is used to hold the URL or bytes of media attached to a message. Either URL
-or Data must be set, but not both.
+ResourcePayload is used to hold the URL of a resource (image, file, etc.) to attach to a message.
 
 See https://developers.facebook.com/docs/messenger-platform/send-api-reference/image-attachment
 */
-type MediaPayload struct {
-	Url  string `json:"url,omitempty"`
-	Data []byte `json:"-"`
+type ResourcePayload struct {
+	URL string `json:"url" binding:"required"`
+}
+
+/*
+DataPayload is used to hold the bytes of a resource (image, file, etc.) to upload and attach
+to a message. All fields are required. FileName will only be visible to the recipient when
+type of the attachment is "file".
+
+See https://developers.facebook.com/docs/messenger-platform/send-api-reference/image-attachment
+*/
+type DataPayload struct {
+	Data        []byte `json:"-"`
+	ContentType string `json:"-"`
+	FileName    string `json:"-"`
 }
 
 /*

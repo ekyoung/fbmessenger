@@ -61,24 +61,24 @@ var _ = Describe("Send API Models", func() {
 	It("should marshal a send request with a text message", func() {
 		sendRequest := TextMessage("Hello, world!").To("USER_ID")
 
-		expectCorrectSendRequestMarshaling(sendRequest, "text-message.json")
+		expectCorrectMarshaling(sendRequest, "text-message.json")
 	})
 
-	It("should marshal a send request with an image attachment", func() {
+	It("should marshal a send request with an image attached using the URL of the image", func() {
 		sendRequest := ImageMessage("IMAGE_URL").To("USER_ID")
 
-		expectCorrectSendRequestMarshaling(sendRequest, "message-with-image-attachment.json")
+		expectCorrectMarshaling(sendRequest, "message-with-image-attachment.json")
 	})
 
-	It("should marshal a send request with an image upload attachment", func() {
+	It("should marshal an a message with an image attached by uploading the image", func() {
 		imageBytes, err := ioutil.ReadFile("./sample-send-api-data/fb-logo.png")
 		if err != nil {
 			Fail(fmt.Sprintf("Error reading image file: %v", err))
 		}
 
-		sendRequest := ImageUploadMessage(imageBytes).To("USER_ID")
+		sendRequest := ImageDataMessage(imageBytes, "image/png")
 
-		expectCorrectSendRequestMarshaling(sendRequest, "message-with-image-upload-attachment.json")
+		expectCorrectMarshaling(sendRequest.Message, "message-with-image-upload-attachment.json")
 	})
 
 	It("should marshal a send request with a button attachment", func() {
@@ -96,31 +96,31 @@ var _ = Describe("Send API Models", func() {
 
 		sendRequest := ButtonTemplateMessage("What do you want to do next?", showWebsite, startChatting).To("USER_ID")
 
-		expectCorrectSendRequestMarshaling(sendRequest, "message-with-button-attachment.json")
+		expectCorrectMarshaling(sendRequest, "message-with-button-attachment.json")
 	})
 
 	It("should marshal a send request to a phone number", func() {
 		sendRequest := TextMessage("Hello, world!").ToPhoneNumber("+1(212)555-2368")
 
-		expectCorrectSendRequestMarshaling(sendRequest, "text-message-to-phone-number.json")
+		expectCorrectMarshaling(sendRequest, "text-message-to-phone-number.json")
 	})
 
 	It("should marshal a send request with a REGULAR notification type", func() {
 		sendRequest := TextMessage("Hello, world!").To("USER_ID").Regular()
 
-		expectCorrectSendRequestMarshaling(sendRequest, "text-message-regular.json")
+		expectCorrectMarshaling(sendRequest, "text-message-regular.json")
 	})
 
 	It("should marshal a send request with a SILENT_PUSH notification type", func() {
 		sendRequest := TextMessage("Hello, world!").To("USER_ID").SilentPush()
 
-		expectCorrectSendRequestMarshaling(sendRequest, "text-message-silent-push.json")
+		expectCorrectMarshaling(sendRequest, "text-message-silent-push.json")
 	})
 
 	It("should marshal a send request with a NO_PUSH notification type", func() {
 		sendRequest := TextMessage("Hello, world!").To("USER_ID").NoPush()
 
-		expectCorrectSendRequestMarshaling(sendRequest, "text-message-no-push.json")
+		expectCorrectMarshaling(sendRequest, "text-message-no-push.json")
 	})
 
 	It("should unmarshal a successful response", func() {
@@ -161,11 +161,11 @@ func loadSendRequestString(fileName string) string {
 	return string(fileBytes)
 }
 
-func expectCorrectSendRequestMarshaling(sendRequest *SendRequest, fileName string) {
-	sendBytes, err := json.MarshalIndent(sendRequest, "", "  ")
+func expectCorrectMarshaling(v interface{}, fileName string) {
+	sendBytes, err := json.MarshalIndent(v, "", "  ")
 
 	if err != nil {
-		Fail(fmt.Sprintf("Error marshaling send request: %v", err))
+		Fail(fmt.Sprintf("Error marshaling value: %v", err))
 	}
 
 	sendString := string(sendBytes)
