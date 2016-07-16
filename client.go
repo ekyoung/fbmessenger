@@ -149,7 +149,7 @@ func (c *Client) newFormDataRequest(sendRequest *SendRequest, pageAccessToken st
 func writeFormField(w *multipart.Writer, fieldName string, value interface{}) error {
 	valueBytes, err := json.Marshal(value)
 	if err != nil {
-		return fmt.Errorf("Error marshaling value for field %v: %v", fieldName, err)
+		return fmt.Errorf("error marshaling value for field %v: %v", fieldName, err)
 	}
 
 	w.WriteField(fieldName, string(valueBytes))
