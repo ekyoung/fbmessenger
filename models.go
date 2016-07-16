@@ -180,7 +180,7 @@ type ButtonPayload struct {
 type Button struct {
 	Type    string `json:"type" binding:"required"`
 	Title   string `json:"title" binding:"required"`
-	Url     string `json:"url,omitempty"`
+	URL     string `json:"url,omitempty"`
 	Payload string `json:"payload,omitempty"`
 }
 
@@ -271,7 +271,7 @@ type CallbackAttachment struct {
 
 // CallbackAttachmentPayload holds the URL of an attachment sent by the user.
 type CallbackAttachmentPayload struct {
-	Url string `json:"url" binding:"required"`
+	URL string `json:"url" binding:"required"`
 }
 
 /*
@@ -315,7 +315,7 @@ See https://developers.facebook.com/docs/messenger-platform/user-profile
 type UserProfile struct {
 	FirstName       string `json:"first_name"`
 	LastName        string `json:"last_name"`
-	ProfilePhotoUrl string `json:"profile_pic"`
+	ProfilePhotoURL string `json:"profile_pic"`
 	Locale          string `json:"locale"`
 	Timezone        int    `json:"timezone"`
 	Gender          string `json:"gender"`

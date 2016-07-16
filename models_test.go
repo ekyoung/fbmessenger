@@ -27,7 +27,7 @@ var _ = Describe("Callback Models", func() {
 			Expect(cb.Entries[0].Messaging[0].Message.Attachments).ToNot(BeNil())
 			attachment := cb.Entries[0].Messaging[0].Message.Attachments[0]
 			Expect(attachment.Type).To(Equal("image"))
-			Expect(attachment.Payload.Url).To(Equal("IMAGE_URL"))
+			Expect(attachment.Payload.URL).To(Equal("IMAGE_URL"))
 		})
 	})
 
@@ -84,7 +84,7 @@ var _ = Describe("Send API Models", func() {
 	It("should marshal a send request with a button attachment", func() {
 		showWebsite := &Button{
 			Type:  "web_url",
-			Url:   "https://petersapparel.parseapp.com",
+			URL:   "https://petersapparel.parseapp.com",
 			Title: "Show Website",
 		}
 
