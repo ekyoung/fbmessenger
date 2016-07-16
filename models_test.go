@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strings"
 )
 
 var _ = Describe("Callback Models", func() {
@@ -99,6 +100,31 @@ var _ = Describe("Send API Models", func() {
 		expectCorrectMarshaling(sendRequest, "message-with-button-attachment.json")
 	})
 
+	It("should marshal a send request with a generic attachment", func() {
+		viewWebsite := &Button{
+			Type:  "web_url",
+			URL:   "https://petersapparel.parseapp.com/view_item?item_id=100",
+			Title: "View Website",
+		}
+
+		startChatting := &Button{
+			Type:    "postback",
+			Title:   "Start Chatting",
+			Payload: "USER_DEFINED_PAYLOAD",
+		}
+
+		welcome := &GenericPayloadElement{
+			Title:    "Welcome to Peter's Hats",
+			ImageURL: "http://petersapparel.parseapp.com/img/item100-thumb.png",
+			Subtitle: "We've got the right hat for everyone.",
+			Buttons:  []*Button{viewWebsite, startChatting},
+		}
+
+		sendRequest := GenericTemplateMessage(welcome).To("USER_ID")
+
+		expectCorrectMarshaling(sendRequest, "message-with-generic-template-attachment.json")
+	})
+
 	It("should marshal a send request to a phone number", func() {
 		sendRequest := TextMessage("Hello, world!").ToPhoneNumber("+1(212)555-2368")
 
@@ -158,19 +184,24 @@ func loadSendRequestString(fileName string) string {
 		Fail(fmt.Sprintf("Error reading file \"%v\": %v", fileName, err))
 	}
 
-	return string(fileBytes)
+	return makeOneLine(string(fileBytes))
 }
 
 func expectCorrectMarshaling(v interface{}, fileName string) {
 	sendBytes, err := json.MarshalIndent(v, "", "  ")
-
 	if err != nil {
 		Fail(fmt.Sprintf("Error marshaling value: %v", err))
 	}
 
-	sendString := string(sendBytes)
+	sendString := makeOneLine(string(sendBytes))
 
 	Expect(sendString).To(Equal(loadSendRequestString(fileName)))
+}
+
+func makeOneLine(s string) string {
+	s = strings.Replace(s, "\r\n", "", -1)
+	s = strings.Replace(s, "\n", "", -1)
+	return s
 }
 
 func loadSendResponse(fileName string, response *SendResponse) {

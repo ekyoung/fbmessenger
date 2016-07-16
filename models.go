@@ -17,8 +17,12 @@ func TextMessage(text string) *SendRequest {
 	}
 }
 
-// ImageMessage is a fluent helper method for creating a SendRequest containing a message with
-// an image attached using the URL of the image.
+/*
+ImageMessage is a fluent helper method for creating a SendRequest containing a message with
+an image attached using the URL of the image.
+
+See https://developers.facebook.com/docs/messenger-platform/send-api-reference/image-attachment
+*/
 func ImageMessage(url string) *SendRequest {
 	return &SendRequest{
 		Message: Message{
@@ -41,6 +45,8 @@ with an image attached by uploading the bytes of the image.
 
 Detecting the content type of a file dynamically, or converting to one of the image formats
 supported by Facebook is the responsibility of the user.
+
+See https://developers.facebook.com/docs/messenger-platform/send-api-reference/image-attachment
 */
 func ImageDataMessage(data []byte, contentType string) *SendRequest {
 	return &SendRequest{
@@ -57,8 +63,12 @@ func ImageDataMessage(data []byte, contentType string) *SendRequest {
 	}
 }
 
-// ButtonTemplateMessage is a fluent helper method for creating a SendRequest containing text
-// and buttons to request input from the user.
+/*
+ButtonTemplateMessage is a fluent helper method for creating a SendRequest containing text
+and buttons to request input from the user.
+
+See https://developers.facebook.com/docs/messenger-platform/send-api-reference/button-template
+*/
 func ButtonTemplateMessage(text string, buttons ...*Button) *SendRequest {
 	return &SendRequest{
 		Message: Message{
@@ -68,6 +78,27 @@ func ButtonTemplateMessage(text string, buttons ...*Button) *SendRequest {
 					TemplateType: "button",
 					Text:         text,
 					Buttons:      buttons,
+				},
+			},
+		},
+	}
+}
+
+/*
+GenericTemplateMessage is a fluent helper method for creating a SendRequest containing
+a carousel of elements, each composed of an image attachment, short description and
+buttons to request input from the user.
+
+See https://developers.facebook.com/docs/messenger-platform/send-api-reference/generic-template
+*/
+func GenericTemplateMessage(elements ...*GenericPayloadElement) *SendRequest {
+	return &SendRequest{
+		Message: Message{
+			Attachment: &Attachment{
+				Type: "template",
+				Payload: GenericPayload{
+					TemplateType: "generic",
+					Elements:     elements,
 				},
 			},
 		},
@@ -182,6 +213,24 @@ type Button struct {
 	Title   string `json:"title" binding:"required"`
 	URL     string `json:"url,omitempty"`
 	Payload string `json:"payload,omitempty"`
+}
+
+/*
+GenericPayload is used to build a structured message using the generic template.
+
+See https://developers.facebook.com/docs/messenger-platform/send-api-reference/generic-template
+*/
+type GenericPayload struct {
+	TemplateType string                   `json:"template_type" binding:"required"`
+	Elements     []*GenericPayloadElement `json:"elements" binding:"required"`
+}
+
+// GenericPayloadElement represents one item in the carousel of a generic template message.
+type GenericPayloadElement struct {
+	Title    string    `json:"title" binding:"required"`
+	ImageURL string    `json:"image_url": binding:"required"`
+	Subtitle string    `json:"subtitle" binding:"required"`
+	Buttons  []*Button `json:"buttons" binding:"required"`
 }
 
 /*
