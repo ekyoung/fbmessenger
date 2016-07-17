@@ -6,7 +6,7 @@ Go (golang) package for writing bots on the [Facebook Messenger Platform](https:
 
 ## Key Features
 
-* Fluent API makes building messages to send easy.
+* Fluent API makes building messages easy.
 * Timeoutable, cancellable requests using `context.Context`.
 * Designed for use with one or many subscribed pages.
 
