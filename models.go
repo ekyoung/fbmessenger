@@ -146,6 +146,32 @@ type ReceiptHeader struct {
 	Timestamp     string
 }
 
+/*
+WithReceiptAddress is a fluent helper method for setting the Address of a ReceiptPayload
+for the message. It is a mutator and returns the same SendRequest on which it is
+called to support method chaining.
+*/
+func (sr *SendRequest) WithReceiptAddress(address *Address) *SendRequest {
+	receipt, _ := sr.Message.Attachment.Payload.(*ReceiptPayload)
+
+	receipt.Address = address
+
+	return sr
+}
+
+/*
+WithReceiptAdjustments is a fluent helper method for setting the Adjustments of a
+ReceiptPayload for the message. It is a mutator and returns the same SendRequest
+on which it is called to support method chaining.
+*/
+func (sr *SendRequest) WithReceiptAdjustments(adjustments ...*ReceiptAdjustment) *SendRequest {
+	receipt, _ := sr.Message.Attachment.Payload.(*ReceiptPayload)
+
+	receipt.Adjustments = adjustments
+
+	return sr
+}
+
 // URLButton is a fluent helper method for creating a button with type "web_url" for
 // use in a message with a button template or generic template attachment.
 func URLButton(title, url string) *Button {

@@ -143,11 +143,7 @@ var _ = Describe("Send API Models", func() {
 			ImageURL: "http://petersapparel.parseapp.com/img/grayshirt.png",
 		}
 
-		sendRequest := ReceiptTemplateMessage(header, summary, whiteShirt, grayShirt).To("USER_ID")
-
-		receipt, _ := sendRequest.Message.Attachment.Payload.(*ReceiptPayload)
-
-		receipt.Address = &Address{
+		address := &Address{
 			Street1:    "1 Hacker Way",
 			City:       "Menlo Park",
 			PostalCode: "94025",
@@ -155,16 +151,20 @@ var _ = Describe("Send API Models", func() {
 			Country:    "US",
 		}
 
-		receipt.Adjustments = []*ReceiptAdjustment{
-			&ReceiptAdjustment{
-				Name:   "New Customer Discount",
-				Amount: "20",
-			},
-			&ReceiptAdjustment{
-				Name:   "$10 Off Coupon",
-				Amount: "10",
-			},
+		newCustomerDiscount := &ReceiptAdjustment{
+			Name:   "New Customer Discount",
+			Amount: "20",
 		}
+
+		coupon := &ReceiptAdjustment{
+			Name:   "$10 Off Coupon",
+			Amount: "10",
+		}
+
+		sendRequest := ReceiptTemplateMessage(header, summary, whiteShirt, grayShirt).
+			WithReceiptAddress(address).
+			WithReceiptAdjustments(newCustomerDiscount, coupon).
+			To("USER_ID")
 
 		expectCorrectMarshaling(sendRequest, "message-with-receipt-attachment.json")
 	})
