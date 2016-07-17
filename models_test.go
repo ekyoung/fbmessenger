@@ -83,11 +83,10 @@ var _ = Describe("Send API Models", func() {
 	})
 
 	It("should marshal a send request with a button attachment", func() {
-		showWebsite := URLButton("Show Website", "https://petersapparel.parseapp.com")
-
-		startChatting := PostbackButton("Start Chatting", "USER_DEFINED_PAYLOAD")
-
-		sendRequest := ButtonTemplateMessage("What do you want to do next?", showWebsite, startChatting).To("USER_ID")
+		sendRequest := ButtonTemplateMessage("What do you want to do next?",
+			URLButton("Show Website", "https://petersapparel.parseapp.com"),
+			PostbackButton("Start Chatting", "USER_DEFINED_PAYLOAD")).
+			To("USER_ID")
 
 		expectCorrectMarshaling(sendRequest, "message-with-button-attachment.json")
 	})
