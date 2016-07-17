@@ -96,7 +96,7 @@ var _ = Describe("Send API Models", func() {
 
 		startChatting := PostbackButton("Start Chatting", "USER_DEFINED_PAYLOAD")
 
-		welcome := &GenericPayloadElement{
+		welcome := &GenericElement{
 			Title:    "Welcome to Peter's Hats",
 			ImageURL: "http://petersapparel.parseapp.com/img/item100-thumb.png",
 			Subtitle: "We've got the right hat for everyone.",
@@ -106,6 +106,67 @@ var _ = Describe("Send API Models", func() {
 		sendRequest := GenericTemplateMessage(welcome).To("USER_ID")
 
 		expectCorrectMarshaling(sendRequest, "message-with-generic-template-attachment.json")
+	})
+
+	It("should marshal a send request with a receipt attachment", func() {
+		header := &ReceiptHeader{
+			RecipientName: "Stephane Crozatier",
+			OrderNumber:   "12345678902",
+			Currency:      "USD",
+			PaymentMethod: "Visa 2345",
+			OrderURL:      "http://petersapparel.parseapp.com/order?order_id=123456",
+			Timestamp:     "1428444852",
+		}
+
+		summary := &ReceiptSummary{
+			Subtotal:     "75.00",
+			ShippingCost: "4.95",
+			TotalTax:     "6.19",
+			TotalCost:    "56.14",
+		}
+
+		whiteShirt := &ReceiptElement{
+			Title:    "Classic White T-Shirt",
+			Subtitle: "100% Soft and Luxurious Cotton",
+			Quantity: 2,
+			Price:    "50",
+			Currency: "USD",
+			ImageURL: "http://petersapparel.parseapp.com/img/whiteshirt.png",
+		}
+
+		grayShirt := &ReceiptElement{
+			Title:    "Classic Gray T-Shirt",
+			Subtitle: "100% Soft and Luxurious Cotton",
+			Quantity: 1,
+			Price:    "25",
+			Currency: "USD",
+			ImageURL: "http://petersapparel.parseapp.com/img/grayshirt.png",
+		}
+
+		sendRequest := ReceiptTemplateMessage(header, summary, whiteShirt, grayShirt).To("USER_ID")
+
+		receipt, _ := sendRequest.Message.Attachment.Payload.(*ReceiptPayload)
+
+		receipt.Address = &Address{
+			Street1:    "1 Hacker Way",
+			City:       "Menlo Park",
+			PostalCode: "94025",
+			State:      "CA",
+			Country:    "US",
+		}
+
+		receipt.Adjustments = []*ReceiptAdjustment{
+			&ReceiptAdjustment{
+				Name:   "New Customer Discount",
+				Amount: "20",
+			},
+			&ReceiptAdjustment{
+				Name:   "$10 Off Coupon",
+				Amount: "10",
+			},
+		}
+
+		expectCorrectMarshaling(sendRequest, "message-with-receipt-attachment.json")
 	})
 
 	It("should marshal a send request to a phone number", func() {

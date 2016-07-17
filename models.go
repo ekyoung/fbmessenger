@@ -1,6 +1,7 @@
 package fbmessenger
 
 import (
+	"encoding/json"
 	"strings"
 )
 
@@ -91,7 +92,7 @@ buttons to request input from the user.
 
 See https://developers.facebook.com/docs/messenger-platform/send-api-reference/generic-template
 */
-func GenericTemplateMessage(elements ...*GenericPayloadElement) *SendRequest {
+func GenericTemplateMessage(elements ...*GenericElement) *SendRequest {
 	return &SendRequest{
 		Message: Message{
 			Attachment: &Attachment{
@@ -103,6 +104,46 @@ func GenericTemplateMessage(elements ...*GenericPayloadElement) *SendRequest {
 			},
 		},
 	}
+}
+
+/*
+ReceiptTemplateMessage is a fluent helper method for creating a SendRequest containing
+a detailed order confirmation.
+
+https://developers.facebook.com/docs/messenger-platform/send-api-reference/receipt-template
+*/
+func ReceiptTemplateMessage(header *ReceiptHeader, summary *ReceiptSummary, elements ...*ReceiptElement) *SendRequest {
+	payload := &ReceiptPayload{
+		TemplateType:  "receipt",
+		RecipientName: header.RecipientName,
+		OrderNumber:   header.OrderNumber,
+		Currency:      header.Currency,
+		PaymentMethod: header.PaymentMethod,
+		OrderURL:      header.OrderURL,
+		Timestamp:     header.Timestamp,
+		Elements:      elements,
+		Summary:       summary,
+	}
+
+	return &SendRequest{
+		Message: Message{
+			Attachment: &Attachment{
+				Type:    "template",
+				Payload: payload,
+			},
+		},
+	}
+}
+
+// ReceiptHeader holds just the top level fields for a ReceiptPayload. For use with
+// the ReceiptTemplateMessage fluent helper method.
+type ReceiptHeader struct {
+	RecipientName string
+	OrderNumber   string
+	Currency      string
+	PaymentMethod string
+	OrderURL      string
+	Timestamp     string
 }
 
 // URLButton is a fluent helper method for creating a button with type "web_url" for
@@ -241,16 +282,71 @@ GenericPayload is used to build a structured message using the generic template.
 See https://developers.facebook.com/docs/messenger-platform/send-api-reference/generic-template
 */
 type GenericPayload struct {
-	TemplateType string                   `json:"template_type" binding:"required"`
-	Elements     []*GenericPayloadElement `json:"elements" binding:"required"`
+	TemplateType string            `json:"template_type" binding:"required"`
+	Elements     []*GenericElement `json:"elements" binding:"required"`
 }
 
-// GenericPayloadElement represents one item in the carousel of a generic template message.
-type GenericPayloadElement struct {
+// GenericElement represents one item in the carousel of a generic template message.
+type GenericElement struct {
 	Title    string    `json:"title" binding:"required"`
 	ImageURL string    `json:"image_url": binding:"required"`
 	Subtitle string    `json:"subtitle" binding:"required"`
 	Buttons  []*Button `json:"buttons" binding:"required"`
+}
+
+/*
+ReceiptPayload is used to build a structured message using the receipt template.
+
+See https://developers.facebook.com/docs/messenger-platform/send-api-reference/receipt-template
+*/
+type ReceiptPayload struct {
+	TemplateType  string               `json:"template_type" binding:"required"`
+	RecipientName string               `json:"recipient_name" binding:"required"`
+	OrderNumber   string               `json:"order_number" binding:"required"`
+	Currency      string               `json:"currency" binding:"required"`
+	PaymentMethod string               `json:"payment_method" binding:"required"`
+	Timestamp     string               `json:"timestamp,omitempty"`
+	OrderURL      string               `json:"order_url,omitempty"`
+	Elements      []*ReceiptElement    `json:"elements" binding:"required"`
+	Address       *Address             `json:"address,omitempty"`
+	Summary       *ReceiptSummary      `json:"summary" binding:"required"`
+	Adjustments   []*ReceiptAdjustment `json:"adjustments,omitempty"`
+}
+
+// ReceiptElement represents a line item for one purchased item (not tax or shipping)
+// on a receipt.
+type ReceiptElement struct {
+	Title    string      `json:"title" binding:"required"`
+	Subtitle string      `json:"subtitle,omitempty"`
+	Quantity int         `json:"quantity,omitempty"`
+	Price    json.Number `json:"price" binding:"required"`
+	Currency string      `json:"currency,omitempty"`
+	ImageURL string      `json:"image_url,omitempty"`
+}
+
+// Address represents a physical mailing address
+type Address struct {
+	Street1    string `json:"street_1" binding:"required"`
+	Street2    string `json:"street_2,omitempty"`
+	City       string `json:"city" binding:"required"`
+	PostalCode string `json:"postal_code" binding:"required"`
+	State      string `json:"state" binding:"required"`
+	Country    string `json:"country" binding:"required"`
+}
+
+// ReceiptSummary represents the line items for totals and additional costs
+// (tax and shipping) on a receipt.
+type ReceiptSummary struct {
+	Subtotal     json.Number `json:"subtotal,omitempty"`
+	ShippingCost json.Number `json:"shipping_cost,omitempty"`
+	TotalTax     json.Number `json:"total_tax,omitempty"`
+	TotalCost    json.Number `json:"total_cost" binding:"required"`
+}
+
+// ReceiptAdjustment represents discounts applied to a receipt.
+type ReceiptAdjustment struct {
+	Name   string      `json:"name,omitempty"`
+	Amount json.Number `json:"amount"`
 }
 
 /*
