@@ -12,13 +12,9 @@ Go (golang) package for writing bots on the [Facebook Messenger Platform](https:
 
 ## Installation
 
-Expect breaking changes:
-
 ```bash
-go get https://github.com/ekyoung/fbmessenger
+go get gopkg.in/ekyoung/fbmessenger.v1
 ```
-
-Stable installation via [gopkg.in](http://labix.org/gopkg.in) coming soon.
 
 ## Quick Start
 
