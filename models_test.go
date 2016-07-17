@@ -83,17 +83,9 @@ var _ = Describe("Send API Models", func() {
 	})
 
 	It("should marshal a send request with a button attachment", func() {
-		showWebsite := &Button{
-			Type:  "web_url",
-			URL:   "https://petersapparel.parseapp.com",
-			Title: "Show Website",
-		}
+		showWebsite := URLButton("Show Website", "https://petersapparel.parseapp.com")
 
-		startChatting := &Button{
-			Type:    "postback",
-			Title:   "Start Chatting",
-			Payload: "USER_DEFINED_PAYLOAD",
-		}
+		startChatting := PostbackButton("Start Chatting", "USER_DEFINED_PAYLOAD")
 
 		sendRequest := ButtonTemplateMessage("What do you want to do next?", showWebsite, startChatting).To("USER_ID")
 
@@ -101,17 +93,9 @@ var _ = Describe("Send API Models", func() {
 	})
 
 	It("should marshal a send request with a generic attachment", func() {
-		viewWebsite := &Button{
-			Type:  "web_url",
-			URL:   "https://petersapparel.parseapp.com/view_item?item_id=100",
-			Title: "View Website",
-		}
+		viewWebsite := URLButton("View Website", "https://petersapparel.parseapp.com/view_item?item_id=100")
 
-		startChatting := &Button{
-			Type:    "postback",
-			Title:   "Start Chatting",
-			Payload: "USER_DEFINED_PAYLOAD",
-		}
+		startChatting := PostbackButton("Start Chatting", "USER_DEFINED_PAYLOAD")
 
 		welcome := &GenericPayloadElement{
 			Title:    "Welcome to Peter's Hats",

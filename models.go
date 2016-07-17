@@ -105,6 +105,26 @@ func GenericTemplateMessage(elements ...*GenericPayloadElement) *SendRequest {
 	}
 }
 
+// URLButton is a fluent helper method for creating a button with type "web_url" for
+// use in a message with a button template or generic template attachment.
+func URLButton(title, url string) *Button {
+	return &Button{
+		Type:  "web_url",
+		Title: title,
+		URL:   url,
+	}
+}
+
+// PostbackButton is a fluent helper method for creating a button with type "payload" for
+// use in a message with a button template or generic template attachment.
+func PostbackButton(title, payload string) *Button {
+	return &Button{
+		Type:    "postback",
+		Title:   title,
+		Payload: payload,
+	}
+}
+
 // To is a fluent helper method for setting Recipient. It is a mutator
 // and returns the same SendRequest on which it is called to support method chaining.
 func (sr *SendRequest) To(userId string) *SendRequest {
