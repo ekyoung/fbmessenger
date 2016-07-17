@@ -113,7 +113,7 @@ func (c *Client) newFormDataRequest(sendRequest *SendRequest, pageAccessToken st
 	}
 
 	if sendRequest.NotificationType != "" {
-		writeFormField(w, "notification_type", sendRequest.NotificationType)
+		err = w.WriteField("notification_type", sendRequest.NotificationType)
 		if err != nil {
 			return nil, err
 		}
@@ -152,9 +152,7 @@ func writeFormField(w *multipart.Writer, fieldName string, value interface{}) er
 		return fmt.Errorf("error marshaling value for field %v: %v", fieldName, err)
 	}
 
-	w.WriteField(fieldName, string(valueBytes))
-
-	return nil
+	return w.WriteField(fieldName, string(valueBytes))
 }
 
 // GetUserProfile GETs a profile with more information about the user.
