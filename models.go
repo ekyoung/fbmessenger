@@ -231,6 +231,23 @@ func (sr *SendRequest) NoPush() *SendRequest {
 	return sr
 }
 
+// TextReply is a fluent helper method for creating a QuickReply with content type "text".
+func TextReply(title string, payload string) *QuickReply {
+	return &QuickReply{
+		ContentType: "text",
+		Title:       title,
+		Payload:     payload,
+	}
+}
+
+// WithQuickReplies is a fluent helper method for setting the quick replies to
+// a message. It is not additive, it replaces any existing quick replies.
+func (sr *SendRequest) WithQuickReplies(replies ...*QuickReply) *SendRequest {
+	sr.Message.QuickReplies = replies
+
+	return sr
+}
+
 /*
 SendRequest is the top level structure for representing any type of message to send.
 
@@ -251,8 +268,9 @@ type Recipient struct {
 // Message can represent either a text message, or a message with an attachment. Either
 // Text or Attachment must be set, but not both.
 type Message struct {
-	Text       string      `json:"text,omitempty"`
-	Attachment *Attachment `json:"attachment,omitempty"`
+	Text         string        `json:"text,omitempty"`
+	Attachment   *Attachment   `json:"attachment,omitempty"`
+	QuickReplies []*QuickReply `json:"quick_replies,omitempty"`
 }
 
 // Attachment is used to build a message with attached media, or a structured message.
@@ -373,6 +391,14 @@ type ReceiptSummary struct {
 type ReceiptAdjustment struct {
 	Name   string      `json:"name,omitempty"`
 	Amount json.Number `json:"amount"`
+}
+
+// QuickReply represents a quick reply to a message.
+type QuickReply struct {
+	ContentType string `json:"content_type" binding:"required"`
+	Title       string `json:"title,omitempty"`
+	Payload     string `json:"payload,omitempty"`
+	ImageUrl    string `json:"image_url,omitempty"`
 }
 
 /*

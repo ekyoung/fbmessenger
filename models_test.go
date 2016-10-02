@@ -65,6 +65,14 @@ var _ = Describe("Send API Models", func() {
 		expectCorrectMarshaling(sendRequest, "text-message.json")
 	})
 
+	It("should marshal a send request with text quick replies", func() {
+		everything := TextReply("Everything", "DEVELOPER_DEFINED_PAYLOAD_FOR_PICKING_EVERYTHING")
+		nothing := TextReply("Nothing", "DEVELOPER_DEFINED_PAYLOAD_FOR_PICKING_NOTHING")
+		sendRequest := TextMessage("What do you want?").WithQuickReplies(everything, nothing).To("USER_ID")
+
+		expectCorrectMarshaling(sendRequest, "text-message-with-text-quick-replies.json")
+	})
+
 	It("should marshal a send request with an image attached using the URL of the image", func() {
 		sendRequest := ImageMessage("IMAGE_URL").To("USER_ID")
 

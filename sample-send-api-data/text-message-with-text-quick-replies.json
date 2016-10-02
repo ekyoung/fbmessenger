@@ -1,0 +1,20 @@
+{
+  "recipient": {
+    "id": "USER_ID"
+  },
+  "message": {
+    "text": "What do you want?",
+    "quick_replies": [
+      {
+        "content_type": "text",
+        "title": "Everything",
+        "payload": "DEVELOPER_DEFINED_PAYLOAD_FOR_PICKING_EVERYTHING"
+      },
+      {
+        "content_type": "text",
+        "title": "Nothing",
+        "payload": "DEVELOPER_DEFINED_PAYLOAD_FOR_PICKING_NOTHING"
+      }
+    ]
+  }
+}
