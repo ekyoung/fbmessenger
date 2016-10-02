@@ -1,0 +1,13 @@
+{
+  "recipient": {
+    "id": "USER_ID"
+  },
+  "message": {
+    "text": "Where are you?",
+    "quick_replies": [
+      {
+        "content_type": "location"
+      }
+    ]
+  }
+}

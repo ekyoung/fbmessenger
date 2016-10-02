@@ -240,6 +240,13 @@ func TextReply(title string, payload string) *QuickReply {
 	}
 }
 
+// LocationReply is a fluent helper method for creating a QuickReply with content type "location".
+func LocationReply() *QuickReply {
+	return &QuickReply{
+		ContentType: "location",
+	}
+}
+
 // WithQuickReplies is a fluent helper method for setting the quick replies to
 // a message. It is not additive, it replaces any existing quick replies.
 func (sr *SendRequest) WithQuickReplies(replies ...*QuickReply) *SendRequest {

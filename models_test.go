@@ -73,6 +73,12 @@ var _ = Describe("Send API Models", func() {
 		expectCorrectMarshaling(sendRequest, "text-message-with-text-quick-replies.json")
 	})
 
+	It("should marshal a send request with a location quick reply", func() {
+		sendRequest := TextMessage("Where are you?").WithQuickReplies(LocationReply()).To("USER_ID")
+
+		expectCorrectMarshaling(sendRequest, "text-message-with-location-quick-reply.json")
+	})
+
 	It("should marshal a send request with an image attached using the URL of the image", func() {
 		sendRequest := ImageMessage("IMAGE_URL").To("USER_ID")
 
