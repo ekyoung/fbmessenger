@@ -232,11 +232,22 @@ func (sr *SendRequest) NoPush() *SendRequest {
 }
 
 // TextReply is a fluent helper method for creating a QuickReply with content type "text".
-func TextReply(title string, payload string) *QuickReply {
+func TextReply(title, payload string) *QuickReply {
 	return &QuickReply{
 		ContentType: "text",
 		Title:       title,
 		Payload:     payload,
+	}
+}
+
+// TextReplyWithImage is a fluent helper method for creating a QuickReply with content type
+// "text" and an attached image.
+func TextReplyWithImage(title, payload, imageURL string) *QuickReply {
+	return &QuickReply{
+		ContentType: "text",
+		Title:       title,
+		Payload:     payload,
+		ImageUrl:    imageURL,
 	}
 }
 

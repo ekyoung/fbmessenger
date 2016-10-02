@@ -1,0 +1,22 @@
+{
+  "recipient": {
+    "id": "USER_ID"
+  },
+  "message": {
+    "text": "What do you want?",
+    "quick_replies": [
+      {
+        "content_type": "text",
+        "title": "Everything",
+        "payload": "DEVELOPER_DEFINED_PAYLOAD_FOR_PICKING_EVERYTHING",
+        "image_url": "http://fake.com/everything.png"
+      },
+      {
+        "content_type": "text",
+        "title": "Nothing",
+        "payload": "DEVELOPER_DEFINED_PAYLOAD_FOR_PICKING_NOTHING",
+        "image_url": "http://fake.com/nothing.png"
+      }
+    ]
+  }
+}
