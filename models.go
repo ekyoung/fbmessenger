@@ -496,17 +496,33 @@ type CallbackMessage struct {
 	Sequence    int                   `json:"seq" binding:"required"`
 	Text        string                `json:"text"`
 	Attachments []*CallbackAttachment `json:"attachments"`
+	QuickReply  *CallbackQuickReply   `json:"quick_reply"`
 }
 
 // CallbackAttachment holds the type and payload of an attachment sent by a user.
 type CallbackAttachment struct {
+	Title   string                    `json:"title"`
+	URL     string                    `json:"url"`
 	Type    string                    `json:"type" binding:"required"`
 	Payload CallbackAttachmentPayload `json:"payload" binding:"required"`
 }
 
-// CallbackAttachmentPayload holds the URL of an attachment sent by the user.
+// CallbackAttachmentPayload holds the URL of a multimedia attachment,
+// or the coordinates of a location attachment sent by the user.
 type CallbackAttachmentPayload struct {
-	URL string `json:"url" binding:"required"`
+	URL         string       `json:"url"`
+	Coordinates *Coordinates `json:"coordinates"`
+}
+
+// Coordinates holds the latitude and longitude of a location.
+type Coordinates struct {
+	Lat  float64 `json:"lat" binding:"required"`
+	Long float64 `json:"long" binding:"required"`
+}
+
+// CallbackQuickReply holds the developer defined payload of a quick reply sent by the user.
+type CallbackQuickReply struct {
+	Payload string `json:"payload" binding:"required"`
 }
 
 /*

@@ -21,14 +21,36 @@ var _ = Describe("Callback Models", func() {
 			Expect(cb.Entries[0].Messaging[0].Message.Text).To(Equal("hello, world!"))
 		})
 
-		It("should unmarshal a callback with a message with an attachment", func() {
+		It("should unmarshal a callback with a quick reply", func() {
 			var cb Callback
-			loadCallback("message-with-attachment.json", &cb)
+			loadCallback("message-with-quick-reply.json", &cb)
 
-			Expect(cb.Entries[0].Messaging[0].Message.Attachments).ToNot(BeNil())
-			attachment := cb.Entries[0].Messaging[0].Message.Attachments[0]
+			message := cb.Entries[0].Messaging[0].Message
+			Expect(message.Text).To(Equal("hello, world!"))
+			Expect(message.QuickReply.Payload).To(Equal("DEVELOPER_DEFINED_PAYLOAD"))
+		})
+
+		It("should unmarshal a callback with a message with an image attachment", func() {
+			var cb Callback
+			loadCallback("message-with-image-attachment.json", &cb)
+
+			message := cb.Entries[0].Messaging[0].Message
+			attachment := message.Attachments[0]
+			Expect(message.Attachments).ToNot(BeNil())
 			Expect(attachment.Type).To(Equal("image"))
 			Expect(attachment.Payload.URL).To(Equal("IMAGE_URL"))
+		})
+
+		It("should unmarshal a callback with a message with a location attachment", func() {
+			var cb Callback
+			loadCallback("message-with-location-attachment.json", &cb)
+
+			message := cb.Entries[0].Messaging[0].Message
+			attachment := message.Attachments[0]
+			Expect(message.Attachments).ToNot(BeNil())
+			Expect(attachment.Type).To(Equal("location"))
+			Expect(attachment.Payload.Coordinates.Lat).To(Equal(37.483872693672))
+			Expect(attachment.Payload.Coordinates.Long).To(Equal(-122.14900441942))
 		})
 	})
 
