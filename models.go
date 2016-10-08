@@ -9,7 +9,7 @@ import (
 Send API
 ------------------------------------------------------*/
 
-// Text message is a fluent helper method for creating a SendRequest containing a text message.
+// TextMessage is a fluent helper method for creating a SendRequest containing a text message.
 func TextMessage(text string) *SendRequest {
 	return &SendRequest{
 		Message: Message{
@@ -247,7 +247,7 @@ func TextReplyWithImage(title, payload, imageURL string) *QuickReply {
 		ContentType: "text",
 		Title:       title,
 		Payload:     payload,
-		ImageUrl:    imageURL,
+		ImageURL:    imageURL,
 	}
 }
 
@@ -351,7 +351,7 @@ type GenericPayload struct {
 // GenericElement represents one item in the carousel of a generic template message.
 type GenericElement struct {
 	Title    string    `json:"title" binding:"required"`
-	ImageURL string    `json:"image_url": binding:"required"`
+	ImageURL string    `json:"image_url" binding:"required"`
 	Subtitle string    `json:"subtitle" binding:"required"`
 	Buttons  []*Button `json:"buttons" binding:"required"`
 }
@@ -416,7 +416,7 @@ type QuickReply struct {
 	ContentType string `json:"content_type" binding:"required"`
 	Title       string `json:"title,omitempty"`
 	Payload     string `json:"payload,omitempty"`
-	ImageUrl    string `json:"image_url,omitempty"`
+	ImageURL    string `json:"image_url,omitempty"`
 }
 
 /*
