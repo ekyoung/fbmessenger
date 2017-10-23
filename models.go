@@ -172,6 +172,15 @@ func (sr *SendRequest) WithReceiptAdjustments(adjustments ...*ReceiptAdjustment)
 	return sr
 }
 
+// URLAction is a fluent helper method for creating an action with type "web_url" for
+// use in a message with generic template attachment.
+func URLAction(url string) *Action {
+	return &Action{
+		Type: "web_url",
+		URL:  url,
+	}
+}
+
 // URLButton is a fluent helper method for creating a button with type "web_url" for
 // use in a message with a button template or generic template attachment.
 func URLButton(title, url string) *Button {
@@ -338,6 +347,13 @@ type Button struct {
 	Payload string `json:"payload,omitempty"`
 }
 
+// Action represents a default action for element in a structured message using the generic template.
+type Action struct {
+	Type    string `json:"type" binding:"required"`
+	URL     string `json:"url,omitempty"`
+	Payload string `json:"payload,omitempty"`
+}
+
 /*
 GenericPayload is used to build a structured message using the generic template.
 
@@ -350,10 +366,11 @@ type GenericPayload struct {
 
 // GenericElement represents one item in the carousel of a generic template message.
 type GenericElement struct {
-	Title    string    `json:"title" binding:"required"`
-	ImageURL string    `json:"image_url" binding:"required"`
-	Subtitle string    `json:"subtitle" binding:"required"`
-	Buttons  []*Button `json:"buttons" binding:"required"`
+	Title         string    `json:"title" binding:"required"`
+	ImageURL      string    `json:"image_url" binding:"required"`
+	Subtitle      string    `json:"subtitle" binding:"required"`
+	DefaultAction *Action   `json:"default_action,omitempty"`
+	Buttons       []*Button `json:"buttons" binding:"required"`
 }
 
 /*
