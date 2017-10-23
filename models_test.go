@@ -152,6 +152,26 @@ var _ = Describe("Send API Models", func() {
 		expectCorrectMarshaling(sendRequest, "message-with-generic-template-attachment.json")
 	})
 
+	It("should marshal a send request with a generic attachment and default action", func() {
+		viewWebsite := URLButton("View Website", "https://petersapparel.parseapp.com/view_item?item_id=100")
+
+		startChatting := PostbackButton("Start Chatting", "USER_DEFINED_PAYLOAD")
+
+		urlAction := URLAction("https://petersapparel.parseapp.com/view_item?item_id=100")
+
+		welcome := &GenericElement{
+			Title:         "Welcome to Peter's Hats",
+			ImageURL:      "http://petersapparel.parseapp.com/img/item100-thumb.png",
+			Subtitle:      "We've got the right hat for everyone.",
+			DefaultAction: urlAction,
+			Buttons:       []*Button{viewWebsite, startChatting},
+		}
+
+		sendRequest := GenericTemplateMessage(welcome).To("USER_ID")
+
+		expectCorrectMarshaling(sendRequest, "message-with-generic-template-attachment-and-default-action.json")
+	})
+
 	It("should marshal a send request with a receipt attachment", func() {
 		header := &ReceiptHeader{
 			RecipientName: "Stephane Crozatier",
