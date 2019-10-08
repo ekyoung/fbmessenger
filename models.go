@@ -22,7 +22,7 @@ func TextMessage(text string) *SendRequest {
 ImageMessage is a fluent helper method for creating a SendRequest containing a message with
 an image attached using the URL of the image.
 
-See https://developers.facebook.com/docs/messenger-platform/send-api-reference/image-attachment
+See https://developers.facebook.com/docs/messenger-platform/send-messages#sending_attachments
 */
 func ImageMessage(url string) *SendRequest {
 	return &SendRequest{
@@ -30,7 +30,66 @@ func ImageMessage(url string) *SendRequest {
 			Attachment: &Attachment{
 				Type: "image",
 				Payload: ResourcePayload{
-					URL: url,
+					URL:      url,
+					Reusable: true,
+				},
+			},
+		},
+	}
+}
+
+/*
+VideoMessage is a fluent helper method for creating a SendRequest containing a message with
+an video attached using the URL of the video.
+
+See https://developers.facebook.com/docs/messenger-platform/send-messages#sending_attachments
+*/
+func VideoMessage(url string) *SendRequest {
+	return &SendRequest{
+		Message: Message{
+			Attachment: &Attachment{
+				Type: "video",
+				Payload: ResourcePayload{
+					URL:      url,
+					Reusable: true,
+				},
+			},
+		},
+	}
+}
+
+/*
+SavedImageMessage is a fluent helper method for creating a SendRequest containing a message with
+an image attached using the identifier of the image asset.
+
+See https://developers.facebook.com/docs/messenger-platform/send-messages#attachment_reuse
+*/
+func SavedImageMessage(id string) *SendRequest {
+	return &SendRequest{
+		Message: Message{
+			Attachment: &Attachment{
+				Type: "image",
+				Payload: SavedAssetPayload{
+					AttachmentID: id,
+				},
+			},
+		},
+	}
+}
+
+/*
+SavedVideoMessage is a fluent helper method for creating a SendRequest containing a message with
+an video attached using the identifier of the video asset.
+
+See https://developers.facebook.com/docs/messenger-platform/send-messages#attachment_reuse
+*/
+func SavedVideoMessage(id string) *SendRequest {
+	return &SendRequest{
+		Message: Message{
+			Attachment: &Attachment{
+				Type: "video",
+				Payload: SavedAssetPayload{
+					AttachmentID: id,
 				},
 			},
 		},
@@ -79,6 +138,27 @@ func ButtonTemplateMessage(text string, buttons ...*Button) *SendRequest {
 					TemplateType: "button",
 					Text:         text,
 					Buttons:      buttons,
+				},
+			},
+		},
+	}
+}
+
+/*
+WebviewButtonTemplateMessage is a fluent helper method for creating a SendRequest containing text
+and webview buttons to request input from the user.
+
+See https://developers.facebook.com/docs/messenger-platform/send-api-reference/button-template
+*/
+func WebviewButtonTemplateMessage(text string, buttons ...*WebviewButton) *SendRequest {
+	return &SendRequest{
+		Message: Message{
+			Attachment: &Attachment{
+				Type: "template",
+				Payload: WebviewButtonPayload{
+					TemplateType:   "button",
+					Text:           text,
+					WebviewButtons: buttons,
 				},
 			},
 		},
@@ -172,6 +252,15 @@ func (sr *SendRequest) WithReceiptAdjustments(adjustments ...*ReceiptAdjustment)
 	return sr
 }
 
+// URLAction is a fluent helper method for creating an action with type "web_url" for
+// use in a message with generic template attachment.
+func URLAction(url string) *Action {
+	return &Action{
+		Type: "web_url",
+		URL:  url,
+	}
+}
+
 // URLButton is a fluent helper method for creating a button with type "web_url" for
 // use in a message with a button template or generic template attachment.
 func URLButton(title, url string) *Button {
@@ -179,6 +268,18 @@ func URLButton(title, url string) *Button {
 		Type:  "web_url",
 		Title: title,
 		URL:   url,
+	}
+}
+
+// WebviewURLButton is a fluent helper method for creating a webview button with type "web_url" for
+// use in a message with a button template or generic template attachment.
+func WebviewURLButton(title, url string) *WebviewButton {
+	return &WebviewButton{
+		Type:        "web_url",
+		Title:       title,
+		URL:         url,
+		HeightRatio: "compact",
+		Extension:   true,
 	}
 }
 
@@ -194,8 +295,8 @@ func PostbackButton(title, payload string) *Button {
 
 // To is a fluent helper method for setting Recipient. It is a mutator
 // and returns the same SendRequest on which it is called to support method chaining.
-func (sr *SendRequest) To(userId string) *SendRequest {
-	sr.Recipient = Recipient{Id: userId}
+func (sr *SendRequest) To(userID string) *SendRequest {
+	sr.Recipient = Recipient{ID: userID}
 
 	return sr
 }
@@ -279,7 +380,7 @@ type SendRequest struct {
 
 // Recipient identifies the user to send to. Either Id or PhoneNumber must be set, but not both.
 type Recipient struct {
-	Id          string `json:"id,omitempty"`
+	ID          string `json:"id,omitempty"`
 	PhoneNumber string `json:"phone_number,omitempty"`
 }
 
@@ -303,7 +404,8 @@ ResourcePayload is used to hold the URL of a resource (image, file, etc.) to att
 See https://developers.facebook.com/docs/messenger-platform/send-api-reference/image-attachment
 */
 type ResourcePayload struct {
-	URL string `json:"url" binding:"required"`
+	URL      string `json:"url" binding:"required"`
+	Reusable bool   `json:"is_reusable" binding:"required"`
 }
 
 /*
@@ -320,6 +422,15 @@ type DataPayload struct {
 }
 
 /*
+SavedAssetPayload is used to hold the identifier of an already saved asset (image, file, etc.) to attach to a message.
+
+See https://developers.facebook.com/docs/messenger-platform/send-messages#attachment_reuse
+*/
+type SavedAssetPayload struct {
+	AttachmentID string `json:"attachment_id" binding:"required"`
+}
+
+/*
 ButtonPayload is used to build a structured message using the button template.
 
 See https://developers.facebook.com/docs/messenger-platform/send-api-reference/button-template
@@ -330,10 +441,38 @@ type ButtonPayload struct {
 	Buttons      []*Button `json:"buttons" binding:"required"`
 }
 
+/*
+WebviewButtonPayload is used to build a structured message using the button template.
+
+See https://developers.facebook.com/docs/messenger-platform/send-api-reference/button-template
+*/
+type WebviewButtonPayload struct {
+	TemplateType   string           `json:"template_type" binding:"required"`
+	Text           string           `json:"text" binding:"required"`
+	WebviewButtons []*WebviewButton `json:"buttons" binding:"required"`
+}
+
 // Button represents a single button in a structured message using the button template.
 type Button struct {
 	Type    string `json:"type" binding:"required"`
 	Title   string `json:"title" binding:"required"`
+	URL     string `json:"url,omitempty"`
+	Payload string `json:"payload,omitempty"`
+}
+
+// WebviewButton represents a single webview button in a structured message using the button template.
+type WebviewButton struct {
+	Type        string `json:"type" binding:"required"`
+	Title       string `json:"title" binding:"required"`
+	URL         string `json:"url,omitempty"`
+	Payload     string `json:"payload,omitempty"`
+	HeightRatio string `json:"webview_height_ratio,omitempty"`
+	Extension   bool   `json:"messenger_extensions,omitempty"`
+}
+
+// Action represents a default action for element in a structured message using the generic template.
+type Action struct {
+	Type    string `json:"type" binding:"required"`
 	URL     string `json:"url,omitempty"`
 	Payload string `json:"payload,omitempty"`
 }
@@ -350,10 +489,11 @@ type GenericPayload struct {
 
 // GenericElement represents one item in the carousel of a generic template message.
 type GenericElement struct {
-	Title    string    `json:"title" binding:"required"`
-	ImageURL string    `json:"image_url" binding:"required"`
-	Subtitle string    `json:"subtitle" binding:"required"`
-	Buttons  []*Button `json:"buttons" binding:"required"`
+	Title         string    `json:"title" binding:"required"`
+	ImageURL      string    `json:"image_url" binding:"required"`
+	Subtitle      string    `json:"subtitle" binding:"required"`
+	DefaultAction *Action   `json:"default_action,omitempty"`
+	Buttons       []*Button `json:"buttons" binding:"required"`
 }
 
 /*
@@ -425,9 +565,10 @@ SendResponse is returned when sending a SendRequest.
 See https://developers.facebook.com/docs/messenger-platform/send-api-reference#response
 */
 type SendResponse struct {
-	RecipientId string     `json:"recipient_id" binding:"required"`
-	MessageId   string     `json:"message_id" binding:"required"`
-	Error       *SendError `json:"error"`
+	RecipientID  string     `json:"recipient_id" binding:"required"`
+	MessageID    string     `json:"message_id" binding:"required"`
+	AttachmentID string     `json:"attachment_id,omitempty"`
+	Error        *SendError `json:"error"`
 }
 
 /*
@@ -440,7 +581,7 @@ type SendError struct {
 	Type      string `json:"type" binding:"required"`
 	Code      int    `json:"code" binding:"required"`
 	ErrorData string `json:"error_data" binding:"required"`
-	FBTraceId string `json:"fbtrace_id" binding:"required"`
+	FBTraceID string `json:"fbtrace_id" binding:"required"`
 }
 
 /*------------------------------------------------------
@@ -460,7 +601,7 @@ type Callback struct {
 
 // Entry is part of the common format of callbacks.
 type Entry struct {
-	PageId    string            `json:"id" binding:"required"`
+	PageID    string            `json:"id" binding:"required"`
 	Time      int               `json:"time" binding:"required"`
 	Messaging []*MessagingEntry `json:"messaging"`
 }
@@ -482,7 +623,7 @@ type MessagingEntry struct {
 
 // Principal holds the Id of a sender or recipient.
 type Principal struct {
-	Id string `json:"id" binding:"required"`
+	ID string `json:"id" binding:"required"`
 }
 
 /*
@@ -492,7 +633,7 @@ Either the Text or Attachments field will be set, but not both.
 See https://developers.facebook.com/docs/messenger-platform/webhook-reference/message-received
 */
 type CallbackMessage struct {
-	MessageId   string                `json:"mid" binding:"required"`
+	MessageID   string                `json:"mid" binding:"required"`
 	Sequence    int                   `json:"seq" binding:"required"`
 	Text        string                `json:"text"`
 	Attachments []*CallbackAttachment `json:"attachments"`
