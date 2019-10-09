@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"golang.org/x/net/context"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
+
+	"golang.org/x/net/context"
 )
 
-const apiURL = "https://graph.facebook.com/v2.6"
+const apiURL = "https://graph.facebook.com/v3.3"
 
 type httpDoer interface {
 	Do(req *http.Request) (*http.Response, error)
